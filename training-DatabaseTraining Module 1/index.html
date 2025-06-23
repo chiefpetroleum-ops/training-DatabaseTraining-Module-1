@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Interactive browser-based SQLite database training with SQL playground" />
-  <meta name="keywords" content="database, SQL, SQLite, training, interactive" />
+  <meta name="description" content="Interactive SQLite database training with SQL playground" />
+  <meta name="keywords" content="SQLite, SQL, training, petroleum, database" />
   <meta name="author" content="True North Data Strategies" />
   <title>Interactive Database Training</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💾</text></svg>">
 
-  <!-- External Styles -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" />
+  <!-- External CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" rel="stylesheet">
 
-  <!-- Local Styles -->
-  <link rel="stylesheet" href="styles.css" />
+  <!-- Local Stylesheet (root path) -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container-fluid">
@@ -37,14 +37,12 @@
             <li class="nav-item"><a class="nav-link" href="#project" data-module="project">🚚 Delivery Tracking Project</a></li>
             <li class="nav-item"><a class="nav-link" href="#summary" data-module="summary">🎓 Summary</a></li>
           </ul>
-          <hr class="my-3 bg-secondary" />
-          <div class="text-center text-muted small py-2">
-            True North Data Strategies
-          </div>
+          <hr class="my-3 bg-secondary">
+          <div class="text-center text-muted small py-2">True North Data Strategies</div>
         </div>
       </nav>
 
-      <!-- Main Content -->
+      <!-- Main content -->
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2" id="page-title">Welcome to Database Training</h1>
@@ -56,13 +54,15 @@
           </div>
         </div>
 
-        <!-- Dynamic Module Loader -->
+        <!-- Dynamic module content -->
         <div id="module-content"></div>
 
         <!-- SQL Playground -->
         <div id="sql-playground" class="mt-4 d-none">
           <div class="card">
-            <div class="card-header bg-dark text-white"><h5 class="mb-0">SQL Playground</h5></div>
+            <div class="card-header bg-dark text-white">
+              <h5 class="mb-0">SQL Playground</h5>
+            </div>
             <div class="card-body">
               <div class="form-group mb-3">
                 <label for="sql-query">Enter SQL Query:</label>
@@ -97,10 +97,12 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- External JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+
+  <!-- Local App Script (root path) -->
   <script src="app.js"></script>
 </body>
 </html>
