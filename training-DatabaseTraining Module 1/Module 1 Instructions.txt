@@ -1,0 +1,2630 @@
+Setting Up Your Local Database Environment - Module 1
+I'll guide you through setting up a local database environment, working with SQL, and manipulating data step by step. Let's approach this like a college class with clear, incremental instructions.
+Step 1: Verifying Admin Rights & Setting Up Your Environment
+First, let's check if you have admin rights on your Windows 11 system.
+Open PowerShell as Administrator by:
+1. Press Windows key
+2. Type "PowerShell"
+3. Right-click on "Windows PowerShell" and select "Run as administrator"
+Now, let's verify your admin status with this command:
+powershell# Check if running as administrator
+$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+Write-Host "Running as administrator: $isAdmin"
+If this returns "True", you have admin rights. If not, you'll need to ensure you're running PowerShell as an administrator.
+Next, let's create our project folder structure:
+powershell# Create project directory on desktop
+$projectRoot = "$env:USERPROFILE\Desktop\DatabaseTraining"
+New-Item -ItemType Directory -Path $projectRoot -Force
+
+# Create subdirectories
+$directories = @(
+    "$projectRoot\data",
+    "$projectRoot\scripts",
+    "$projectRoot\docs",
+    "$projectRoot\json_data"
+)
+foreach ($dir in $directories) {
+    New-Item -ItemType Directory -Path $dir -Force
+}
+
+Write-Host "Project structure created at $projectRoot"
+Step 2: Installing SQLite for Our Database
+Let's install SQLite, a lightweight database engine that's perfect for learning:
+powershell# Create a directory for SQLite
+$sqliteDir = "$projectRoot\sqlite"
+New-Item -ItemType Directory -Path $sqliteDir -Force
+
+# Download SQLite
+$sqliteUrl = "https://www.sqlite.org/2023/sqlite-tools-win32-x86-3410200.zip"
+$sqliteZip = "$sqliteDir\sqlite.zip"
+Invoke-WebRequest -Uri $sqliteUrl -OutFile $sqliteZip
+
+# Extract SQLite
+Expand-Archive -Path $sqliteZip -DestinationPath $sqliteDir -Force
+Remove-Item $sqliteZip
+
+Write-Host "SQLite installed successfully"
+Let's also set up Python since we'll use it for data manipulation:
+powershell# Check if Python is installed
+try {
+    $pythonVersion = python --version
+    Write-Host "Python is already installed: $pythonVersion"
+} catch {
+    Write-Host "Python is not installed. Please install Python from https://www.python.org/downloads/"
+    Write-Host "Be sure to check 'Add Python to PATH' during installation"
+}
+
+# Install required Python packages
+try {
+    python -m pip install --upgrade pip
+    python -m pip install pandas numpy matplotlib seaborn jupyter sqlite3
+    Write-Host "Python packages installed successfully"
+} catch {
+    Write-Host "Error installing Python packages. Make sure Python is properly installed."
+}
+Step 3: Data Preparation
+Now let's prepare our CSV data. First, let's create a Python script to clean and analyze the CSV file:
+powershell# Create a Python script for data cleaning
+$dataCleaningScript = @"
+import pandas as pd
+import os
+
+# Set paths
+project_root = r'$projectRoot'.replace('\\', '\\\\')
+data_path = os.path.join(project_root, 'data', 'sales_data.csv')
+clean_data_path = os.path.join(project_root, 'data', 'sales_data_clean.csv')
+
+# Load the data
+print('Loading data...')
+try:
+    df = pd.read_csv(data_path)
+    print('Data loaded successfully!')
+    print(f'Original data shape: {df.shape}')
+    
+    # Display the first few rows
+    print('\nFirst 5 rows of original data:')
+    print(df.head())
+    
+    # Check for missing values
+    print('\nMissing values per column:')
+    print(df.isnull().sum())
+    
+    # Basic data cleaning
+    # Remove any completely empty rows
+    df = df.dropna(how='all')
+    
+    # Handling date columns (assuming there's a date column)
+    date_columns = df.filter(like='date').columns
+    for col in date_columns:
+        df[col] = pd.to_datetime(df[col], errors='coerce')
+    
+    # Convert any numeric columns that might be stored as strings
+    for col in df.columns:
+        if df[col].dtype == 'object':
+            try:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+            except:
+                pass
+    
+    # Save the cleaned data
+    df.to_csv(clean_data_path, index=False)
+    print(f'\nCleaned data saved to: {clean_data_path}')
+    print(f'Cleaned data shape: {df.shape}')
+    
+except Exception as e:
+    print(f'Error processing data: {e}')
+"@
+
+$dataCleaningScript | Out-File -FilePath "$projectRoot\scripts\clean_data.py" -Encoding utf8
+
+Write-Host "Data cleaning script created"
+Now, let's copy the sales data to our project folder:
+powershell# Copy the CSV file to our data directory
+Copy-Item -Path "Copy of Final Sales Report 2425 Data 1.csv" -Destination "$projectRoot\data\sales_data.csv"
+Write-Host "Sales data copied to project folder"
+Step 4: Creating Our SQLite Database
+Let's create a script to set up our SQLite database and create our first table:
+powershell# Create a SQL script for database setup
+$dbSetupScript = @"
+-- Create database tables
+CREATE TABLE IF NOT EXISTS customers (
+    customer_id INTEGER PRIMARY KEY,
+    customer_name TEXT NOT NULL,
+    contact_person TEXT,
+    email TEXT,
+    phone TEXT,
+    address TEXT,
+    city TEXT,
+    state TEXT,
+    zip_code TEXT,
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS products (
+    product_id INTEGER PRIMARY KEY,
+    product_name TEXT NOT NULL,
+    category TEXT,
+    unit_price REAL NOT NULL,
+    unit_cost REAL NOT NULL,
+    description TEXT,
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sales (
+    sale_id INTEGER PRIMARY KEY,
+    customer_id INTEGER,
+    product_id INTEGER,
+    sale_date TEXT NOT NULL,
+    quantity REAL NOT NULL,
+    total_amount REAL NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
+    FOREIGN KEY (product_id) REFERENCES products (product_id)
+);
+
+CREATE TABLE IF NOT EXISTS drivers (
+    driver_id INTEGER PRIMARY KEY,
+    driver_name TEXT NOT NULL,
+    license_number TEXT,
+    hire_date TEXT,
+    status TEXT CHECK(status IN ('Active', 'Inactive', 'On Leave')),
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS deliveries (
+    delivery_id INTEGER PRIMARY KEY,
+    sale_id INTEGER,
+    driver_id INTEGER,
+    delivery_date TEXT,
+    status TEXT CHECK(status IN ('Scheduled', 'In Transit', 'Delivered', 'Failed')),
+    notes TEXT,
+    FOREIGN KEY (sale_id) REFERENCES sales (sale_id),
+    FOREIGN KEY (driver_id) REFERENCES drivers (driver_id)
+);
+"@
+
+$dbSetupScript | Out-File -FilePath "$projectRoot\scripts\create_database.sql" -Encoding utf8
+
+Write-Host "Database setup script created"
+Now let's execute this script to create our database:
+powershell# Create the database and execute the setup script
+$sqliteExe = Get-ChildItem -Path $sqliteDir -Filter "sqlite3.exe" -Recurse | Select-Object -First 1 -ExpandProperty FullName
+$dbPath = "$projectRoot\data\petroleum_sales.db"
+
+cmd /c "$sqliteExe $dbPath < $projectRoot\scripts\create_database.sql"
+
+Write-Host "Database created successfully at $dbPath"
+Step 5: Creating Sample JSON Data
+Let's create sample JSON data for our other tables:
+powershell# Create sample customer data in JSON format
+$customersJson = @"
+[
+  {
+    "customer_id": 1,
+    "customer_name": "Acme Trucking",
+    "contact_person": "John Doe",
+    "email": "john.doe@acmetrucking.com",
+    "phone": "555-123-4567",
+    "address": "123 Main St",
+    "city": "Denver",
+    "state": "CO",
+    "zip_code": "80014"
+  },
+  {
+    "customer_id": 2,
+    "customer_name": "Mountain Delivery Services",
+    "contact_person": "Jane Smith",
+    "email": "jane.smith@mountaindelivery.com",
+    "phone": "555-987-6543",
+    "address": "456 Pine Ave",
+    "city": "Boulder",
+    "state": "CO",
+    "zip_code": "80302"
+  },
+  {
+    "customer_id": 3,
+    "customer_name": "Western Freight LLC",
+    "contact_person": "Bob Johnson",
+    "email": "bob@westernfreight.com",
+    "phone": "555-456-7890",
+    "address": "789 Oak Blvd",
+    "city": "Fort Collins",
+    "state": "CO",
+    "zip_code": "80525"
+  },
+  {
+    "customer_id": 4,
+    "customer_name": "Rocky Mountain Transport",
+    "contact_person": "Sarah Williams",
+    "email": "sarah@rmtransport.com",
+    "phone": "555-789-0123",
+    "address": "101 River Rd",
+    "city": "Pueblo",
+    "state": "CO",
+    "zip_code": "81001"
+  },
+  {
+    "customer_id": 5,
+    "customer_name": "Colorado Express",
+    "contact_person": "Mike Brown",
+    "email": "mike@coloradoexpress.com",
+    "phone": "555-321-6547",
+    "address": "202 Mountain View Dr",
+    "city": "Colorado Springs",
+    "state": "CO",
+    "zip_code": "80903"
+  }
+]
+"@
+
+$customersJson | Out-File -FilePath "$projectRoot\json_data\customers.json" -Encoding utf8
+
+# Create sample product data in JSON format
+$productsJson = @"
+[
+  {
+    "product_id": 1,
+    "product_name": "Regular Unleaded Gasoline",
+    "category": "Fuel",
+    "unit_price": 3.45,
+    "unit_cost": 2.75,
+    "description": "87 octane unleaded gasoline"
+  },
+  {
+    "product_id": 2,
+    "product_name": "Premium Unleaded Gasoline",
+    "category": "Fuel",
+    "unit_price": 3.85,
+    "unit_cost": 3.15,
+    "description": "91 octane unleaded gasoline"
+  },
+  {
+    "product_id": 3,
+    "product_name": "Diesel Fuel",
+    "category": "Fuel",
+    "unit_price": 3.65,
+    "unit_cost": 2.95,
+    "description": "Standard diesel fuel for trucks and equipment"
+  },
+  {
+    "product_id": 4,
+    "product_name": "Bio-Diesel Blend",
+    "category": "Fuel",
+    "unit_price": 3.75,
+    "unit_cost": 3.05,
+    "description": "B20 bio-diesel blend"
+  },
+  {
+    "product_id": 5,
+    "product_name": "Engine Oil 10W-30",
+    "category": "Lubricant",
+    "unit_price": 25.99,
+    "unit_cost": 18.50,
+    "description": "5 quart container of 10W-30 engine oil"
+  },
+  {
+    "product_id": 6,
+    "product_name": "Transmission Fluid",
+    "category": "Lubricant",
+    "unit_price": 22.99,
+    "unit_cost": 16.25,
+    "description": "Automatic transmission fluid, 1 gallon"
+  },
+  {
+    "product_id": 7,
+    "product_name": "Propane",
+    "category": "Fuel",
+    "unit_price": 2.99,
+    "unit_cost": 2.15,
+    "description": "Propane by the gallon for heating and equipment"
+  }
+]
+"@
+
+$productsJson | Out-File -FilePath "$projectRoot\json_data\products.json" -Encoding utf8
+
+# Create sample driver data in JSON format
+$driversJson = @"
+[
+  {
+    "driver_id": 1,
+    "driver_name": "Michael Johnson",
+    "license_number": "CDL12345CO",
+    "hire_date": "2020-03-15",
+    "status": "Active"
+  },
+  {
+    "driver_id": 2,
+    "driver_name": "Robert Garcia",
+    "license_number": "CDL67890CO",
+    "hire_date": "2018-07-22",
+    "status": "Active"
+  },
+  {
+    "driver_id": 3,
+    "driver_name": "David Martinez",
+    "license_number": "CDL24680CO",
+    "hire_date": "2021-01-10",
+    "status": "Active"
+  },
+  {
+    "driver_id": 4,
+    "driver_name": "James Wilson",
+    "license_number": "CDL13579CO",
+    "hire_date": "2019-05-03",
+    "status": "On Leave"
+  },
+  {
+    "driver_id": 5,
+    "driver_name": "Thomas Anderson",
+    "license_number": "CDL97531CO",
+    "hire_date": "2017-11-28",
+    "status": "Active"
+  },
+  {
+    "driver_id": 6,
+    "driver_name": "Christopher Lee",
+    "license_number": "CDL86420CO",
+    "hire_date": "2022-02-14",
+    "status": "Active"
+  },
+  {
+    "driver_id": 7,
+    "driver_name": "Daniel Brown",
+    "license_number": "CDL11223CO",
+    "hire_date": "2020-09-01",
+    "status": "Inactive"
+  }
+]
+"@
+
+$driversJson | Out-File -FilePath "$projectRoot\json_data\drivers.json" -Encoding utf8
+
+Write-Host "Sample JSON data created successfully"
+Step 6: Creating a Python Script to Import JSON Data to SQLite
+powershell# Create a Python script to import JSON data to SQLite
+$importJsonScript = @"
+import json
+import sqlite3
+import os
+
+# Set paths
+project_root = r'$projectRoot'.replace('\\', '\\\\')
+db_path = os.path.join(project_root, 'data', 'petroleum_sales.db')
+json_dir = os.path.join(project_root, 'json_data')
+
+def import_json_to_sqlite(json_file, table_name):
+    """Import data from a JSON file to a SQLite table"""
+    print(f'Importing {json_file} to {table_name}...')
+    
+    # Load JSON data
+    with open(os.path.join(json_dir, json_file), 'r') as f:
+        data = json.load(f)
+    
+    if not data:
+        print(f'No data found in {json_file}')
+        return
+    
+    # Connect to SQLite database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # Get the first item's keys to use as column names
+    columns = list(data[0].keys())
+    
+    # Insert data into table
+    for item in data:
+        placeholders = ', '.join(['?'] * len(item))
+        columns_str = ', '.join(columns)
+        values = [item[column] for column in columns]
+        
+        query = f'INSERT INTO {table_name} ({columns_str}) VALUES ({placeholders})'
+        cursor.execute(query, values)
+    
+    # Commit and close
+    conn.commit()
+    print(f'Successfully imported {len(data)} records to {table_name}')
+    conn.close()
+
+# Import all JSON files
+try:
+    # Import customers data
+    import_json_to_sqlite('customers.json', 'customers')
+    
+    # Import products data
+    import_json_to_sqlite('products.json', 'products')
+    
+    # Import drivers data
+    import_json_to_sqlite('drivers.json', 'drivers')
+    
+    print('All JSON data imported successfully!')
+    
+except Exception as e:
+    print(f'Error importing JSON data: {e}')
+"@
+
+$importJsonScript | Out-File -FilePath "$projectRoot\scripts\import_json_data.py" -Encoding utf8
+
+Write-Host "JSON import script created"
+Step 7: Creating a Python Script to Add Columns to Tables
+powershell# Create a Python script to add columns to tables
+$addColumnScript = @"
+import sqlite3
+import os
+
+# Set paths
+project_root = r'$projectRoot'.replace('\\', '\\\\')
+db_path = os.path.join(project_root, 'data', 'petroleum_sales.db')
+
+def add_column_to_table(table_name, column_name, column_type):
+    """Add a new column to an existing table"""
+    print(f'Adding column {column_name} to {table_name}...')
+    
+    # Connect to SQLite database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    try:
+        # Check if column already exists
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns = [info[1] for info in cursor.fetchall()]
+        
+        if column_name in columns:
+            print(f'Column {column_name} already exists in {table_name}')
+        else:
+            # Add the new column
+            cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}")
+            conn.commit()
+            print(f'Column {column_name} added successfully to {table_name}')
+    
+    except Exception as e:
+        print(f'Error adding column: {e}')
+    
+    finally:
+        conn.close()
+
+# Example: Add a cost column to the sales table
+add_column_to_table('sales', 'cost', 'REAL')
+
+# Example: Add a profit column to the sales table
+add_column_to_table('sales', 'profit', 'REAL')
+
+print('Column addition completed!')
+"@
+
+$addColumnScript | Out-File -FilePath "$projectRoot\scripts\add_column.py" -Encoding utf8
+
+Write-Host "Add column script created"
+Step 8: Creating a Progress Tracking Markdown File
+powershell# Create a markdown file to track progress
+$progressMarkdown = @"
+# Database Training Progress Tracker
+
+## Module 1: SQLite Database Setup
+
+### Setup Tasks
+- [x] Verify admin rights
+- [x] Create project structure
+- [x] Install SQLite
+- [x] Install Python packages
+
+### Data Preparation
+- [ ] Clean and analyze CSV data
+- [ ] Import CSV data to SQLite
+
+### Database Creation
+- [x] Create database schema
+- [x] Create tables
+- [ ] Import JSON data to tables
+- [ ] Add custom columns
+
+### SQL Practice
+- [ ] Write basic SELECT queries
+- [ ] Filter data with WHERE clauses
+- [ ] Join tables
+- [ ] Create views
+- [ ] Write aggregate queries
+
+## Module 2: Microsoft Access Setup (Upcoming)
+
+### Setup Tasks
+- [ ] Install/verify Microsoft Access
+- [ ] Create a new Access database
+- [ ] Import data from CSV
+- [ ] Create tables and relationships
+
+### Access Features
+- [ ] Create forms
+- [ ] Create reports
+- [ ] Write Access queries
+- [ ] Create macros
+"@
+
+$progressMarkdown | Out-File -FilePath "$projectRoot\docs\progress.md" -Encoding utf8
+
+Write-Host "Progress tracking markdown created"
+Step 9: Module 2 Placeholder for Microsoft Access
+powershell# Create a placeholder for Module 2
+$module2Placeholder = @"
+# Module 2: Microsoft Access Database Setup
+
+This module will cover setting up the same database structure in Microsoft Access.
+
+## Topics to Cover:
+1. Creating a new Access database
+2. Importing data from CSV and JSON
+3. Creating tables and defining relationships
+4. Creating forms for data entry
+5. Creating reports for data visualization
+6. Writing Access queries
+7. Creating macros for automation
+
+## Prerequisites:
+- Microsoft Access installed (part of Microsoft Office)
+- Completed Module 1
+"@
+
+$module2Placeholder | Out-File -FilePath "$projectRoot\docs\module2_plan.md" -Encoding utf8
+
+Write-Host "Module 2 placeholder created"
+Full PowerShell Script
+Here's the complete script that sets up everything:
+powershell# Check if running as administrator
+$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+Write-Host "Running as administrator: $isAdmin"
+
+# Create project directory on desktop
+$projectRoot = "$env:USERPROFILE\Desktop\DatabaseTraining"
+New-Item -ItemType Directory -Path $projectRoot -Force
+
+# Create subdirectories
+$directories = @(
+    "$projectRoot\data",
+    "$projectRoot\scripts",
+    "$projectRoot\docs",
+    "$projectRoot\json_data"
+)
+foreach ($dir in $directories) {
+    New-Item -ItemType Directory -Path $dir -Force
+}
+
+Write-Host "Project structure created at $projectRoot"
+
+# Create a directory for SQLite
+$sqliteDir = "$projectRoot\sqlite"
+New-Item -ItemType Directory -Path $sqliteDir -Force
+
+# Download SQLite
+$sqliteUrl = "https://www.sqlite.org/2023/sqlite-tools-win32-x86-3410200.zip"
+$sqliteZip = "$sqliteDir\sqlite.zip"
+Invoke-WebRequest -Uri $sqliteUrl -OutFile $sqliteZip
+
+# Extract SQLite
+Expand-Archive -Path $sqliteZip -DestinationPath $sqliteDir -Force
+Remove-Item $sqliteZip
+
+Write-Host "SQLite installed successfully"
+
+# Check if Python is installed
+try {
+    $pythonVersion = python --version
+    Write-Host "Python is already installed: $pythonVersion"
+} catch {
+    Write-Host "Python is not installed. Please install Python from https://www.python.org/downloads/"
+    Write-Host "Be sure to check 'Add Python to PATH' during installation"
+}
+
+# Install required Python packages
+try {
+    python -m pip install --upgrade pip
+    python -m pip install pandas numpy matplotlib seaborn jupyter sqlite3
+    Write-Host "Python packages installed successfully"
+} catch {
+    Write-Host "Error installing Python packages. Make sure Python is properly installed."
+}
+
+# Create a Python script for data cleaning
+$dataCleaningScript = @"
+import pandas as pd
+import os
+
+# Set paths
+project_root = r'$projectRoot'.replace('\\', '\\\\')
+data_path = os.path.join(project_root, 'data', 'sales_data.csv')
+clean_data_path = os.path.join(project_root, 'data', 'sales_data_clean.csv')
+
+# Load the data
+print('Loading data...')
+try:
+    df = pd.read_csv(data_path)
+    print('Data loaded successfully!')
+    print(f'Original data shape: {df.shape}')
+    
+    # Display the first few rows
+    print('\nFirst 5 rows of original data:')
+    print(df.head())
+    
+    # Check for missing values
+    print('\nMissing values per column:')
+    print(df.isnull().sum())
+    
+    # Basic data cleaning
+    # Remove any completely empty rows
+    df = df.dropna(how='all')
+    
+    # Handling date columns (assuming there's a date column)
+    date_columns = df.filter(like='date').columns
+    for col in date_columns:
+        df[col] = pd.to_datetime(df[col], errors='coerce')
+    
+    # Convert any numeric columns that might be stored as strings
+    for col in df.columns:
+        if df[col].dtype == 'object':
+            try:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+            except:
+                pass
+    
+    # Save the cleaned data
+    df.to_csv(clean_data_path, index=False)
+    print(f'\nCleaned data saved to: {clean_data_path}')
+    print(f'Cleaned data shape: {df.shape}')
+    
+except Exception as e:
+    print(f'Error processing data: {e}')
+"@
+
+$dataCleaningScript | Out-File -FilePath "$projectRoot\scripts\clean_data.py" -Encoding utf8
+
+Write-Host "Data cleaning script created"
+
+# Copy the CSV file to our data directory
+Copy-Item -Path "Copy of Final Sales Report 2425 Data 1.csv" -Destination "$projectRoot\data\sales_data.csv"
+Write-Host "Sales data copied to project folder"
+
+# Create a SQL script for database setup
+$dbSetupScript = @"
+-- Create database tables
+CREATE TABLE IF NOT EXISTS customers (
+    customer_id INTEGER PRIMARY KEY,
+    customer_name TEXT NOT NULL,
+    contact_person TEXT,
+    email TEXT,
+    phone TEXT,
+    address TEXT,
+    city TEXT,
+    state TEXT,
+    zip_code TEXT,
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS products (
+    product_id INTEGER PRIMARY KEY,
+    product_name TEXT NOT NULL,
+    category TEXT,
+    unit_price REAL NOT NULL,
+    unit_cost REAL NOT NULL,
+    description TEXT,
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sales (
+    sale_id INTEGER PRIMARY KEY,
+    customer_id INTEGER,
+    product_id INTEGER,
+    sale_date TEXT NOT NULL,
+    quantity REAL NOT NULL,
+    total_amount REAL NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
+    FOREIGN KEY (product_id) REFERENCES products (product_id)
+);
+
+CREATE TABLE IF NOT EXISTS drivers (
+    driver_id INTEGER PRIMARY KEY,
+    driver_name TEXT NOT NULL,
+    license_number TEXT,
+    hire_date TEXT,
+    status TEXT CHECK(status IN ('Active', 'Inactive', 'On Leave')),
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS deliveries (
+    delivery_id INTEGER PRIMARY KEY,
+    sale_id INTEGER,
+    driver_id INTEGER,
+    delivery_date TEXT,
+    status TEXT CHECK(status IN ('Scheduled', 'In Transit', 'Delivered', 'Failed')),
+    notes TEXT,
+    FOREIGN KEY (sale_id) REFERENCES sales (sale_id),
+    FOREIGN KEY (driver_id) REFERENCES drivers (driver_id)
+);
+"@
+
+$dbSetupScript | Out-File -FilePath "$projectRoot\scripts\create_database.sql" -Encoding utf8
+
+Write-Host "Database setup script created"
+
+# Create the database and execute the setup script
+$sqliteExe = Get-ChildItem -Path $sqliteDir -Filter "sqlite3.exe" -Recurse | Select-Object -First 1 -ExpandProperty FullName
+$dbPath = "$projectRoot\data\petroleum_sales.db"
+
+cmd /c "$sqliteExe $dbPath < $projectRoot\scripts\create_database.sql"
+
+Write-Host "Database created successfully at $dbPath"
+
+# Create sample customer data in JSON format
+$customersJson = @"
+[
+  {
+    "customer_id": 1,
+    "customer_name": "Acme Trucking",
+    "contact_person": "John Doe",
+    "email": "john.doe@acmetrucking.com",
+    "phone": "555-123-4567",
+    "address": "123 Main St",
+    "city": "Denver",
+    "state": "CO",
+    "zip_code": "80014"
+  },
+  {
+    "customer_id": 2,
+    "customer_name": "Mountain Delivery Services",
+    "contact_person": "Jane Smith",
+    "email": "jane.smith@mountaindelivery.com",
+    "phone": "555-987-6543",
+    "address": "456 Pine Ave",
+    "city": "Boulder",
+    "state": "CO",
+    "zip_code": "80302"
+  },
+  {
+    "customer_id": 3,
+    "customer_name": "Western Freight LLC",
+    "contact_person": "Bob Johnson",
+    "email": "bob@westernfreight.com",
+    "phone": "555-456-7890",
+    "address": "789 Oak Blvd",
+    "city": "Fort Collins",
+    "state": "CO",
+    "zip_code": "80525"
+  },
+  {
+    "customer_id": 4,
+    "customer_name": "Rocky Mountain Transport",
+    "contact_person": "Sarah Williams",
+    "email": "sarah@rmtransport.com",
+    "phone": "555-789-0123",
+    "address": "101 River Rd",
+    "city": "Pueblo",
+    "state": "CO",
+    "zip_code": "81001"
+  },
+  {
+    "customer_id": 5,
+    "customer_name": "Colorado Express",
+    "contact_person": "Mike Brown",
+    "email": "mike@coloradoexpress.com",
+    "phone": "555-321-6547",
+    "address": "202 Mountain View Dr",
+    "city": "Colorado Springs",
+    "state": "CO",
+    "zip_code": "80903"
+  }
+]
+"@
+
+$customersJson | Out-File -FilePath "$projectRoot\json_data\customers.json" -Encoding utf8
+
+# Create sample product data in JSON format
+$productsJson = @"
+[
+  {
+    "product_id": 1,
+    "product_name": "Regular Unleaded Gasoline",
+    "category": "Fuel",
+    "unit_price": 3.45,
+    "unit_cost": 2.75,
+    "description": "87 octane unleaded gasoline"
+  },
+  {
+    "product_id": 2,
+    "product_name": "Premium Unleaded Gasoline",
+    "category": "Fuel",
+    "unit_price": 3.85,
+    "unit_cost": 3.15,
+    "description": "91 octane unleaded gasoline"
+  },
+  {
+    "product_id": 3,
+    "product_name": "Diesel Fuel",
+    "category": "Fuel",
+    "unit_price": 3.65,
+    "unit_cost": 2.95,
+    "description": "Standard diesel fuel for trucks and equipment"
+  },
+  {
+    "product_id": 4,
+    "product_name": "Bio-Diesel Blend",
+    "category": "Fuel",
+    "unit_price": 3.75,
+    "unit_cost": 3.05,
+    "description": "B20 bio-diesel blend"
+  },
+  {
+    "product_id": 5,
+    "product_name": "Engine Oil 10W-30",
+    "category": "Lubricant",
+    "unit_price": 25.99,
+    "unit_cost": 18.50,
+    "description": "5 quart container of 10W-30 engine oil"
+  },
+  {
+    "product_id": 6,
+    "product_name": "Transmission Fluid",
+    "category": "Lubricant",
+    "unit_price": 22.99,
+    "unit_cost": 16.25,
+    "description": "Automatic transmission fluid, 1 gallon"
+  },
+  {
+    "product_id": 7,
+    "product_name": "Propane",
+    "category": "Fuel",
+    "unit_price": 2.99,
+    "unit_cost": 2.15,
+    "description": "Propane by the gallon for heating and equipment"
+  }
+]
+"@
+
+$productsJson | Out-File -FilePath "$projectRoot\json_data\products.json" -Encoding utf8
+
+# Create sample driver data in JSON format
+$driversJson = @"
+[
+  {
+    "driver_id": 1,
+    "driver_name": "Michael Johnson",
+    "license_number": "CDL12345CO",
+    "hire_date": "2020-03-15",
+    "status": "Active"
+  },
+  {
+    "driver_id": 2,
+    "driver_name": "Robert Garcia",
+    "license_number": "CDL67890CO",
+    "hire_date": "2018-07-22",
+    "status": "Active"
+  },
+  {
+    "driver_id": 3,
+    "driver_name": "David Martinez",
+    "license_number": "CDL24680CO",
+    "hire_date": "2021-01-10",
+    "status": "Active"
+  },
+  {
+    "driver_id": 4,
+    "driver_name": "James Wilson",
+    "license_number": "CDL13579CO",
+    "hire_date": "2019-05-03",
+    "status": "On Leave"
+  },
+  {
+    "driver_id": 5,
+    "driver_name": "Thomas Anderson",
+    "license_number": "CDL97531CO",
+    "hire_date": "2017-11-28",
+    "status": "Active"
+  },
+  {
+    "driver_id": 6,
+    "driver_name": "Christopher Lee",
+    "license_number": "CDL86420CO",
+    "hire_date": "2022-02-14",
+    "status": "Active"
+  },
+  {
+    "driver_id": 7,
+    "driver_name": "Daniel Brown",
+    "license_number": "CDL11223CO",
+    "hire_date": "2020-09-01",
+    "status": "Inactive"
+  }
+]
+"@
+
+$driversJson | Out-File -FilePath "$projectRoot\json_data\drivers.json" -Encoding utf8
+
+Write-Host "Sample JSON data created successfully"
+
+# Create a Python script to import JSON data to SQLite
+$importJsonScript = @"
+import json
+import sqlite3
+import os
+
+# Set paths
+project_root = r'$projectRoot'.replace('\\', '\\\\')
+db_path = os.path.join(project_root, 'data', 'petroleum_sales.db')
+json_dir = os.path.join(project_root, 'json_data')
+
+def import_json_to_sqlite(json_file, table_name):
+    """Import data from a JSON file to a SQLite table"""
+    print(f'Importing {json_file} to {table_name}...')
+    
+    # Load JSON data
+    with open(os.path.join(json_dir, json_file), 'r') as f:
+        data = json.load(f)
+    
+    if not data:
+        print(f'No data found in {json_file}')
+        return
+    
+    # Connect to SQLite database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # Get the first item's keys to use as column names
+    columns = list(data[0].keys())
+    
+    # Insert data into table
+    for item in data:
+        placeholders = ', '.join(['?'] * len(item))
+        columns_str = ', '.join(columns)
+        values = [item[column] for column in columns]
+        
+        query = f'INSERT INTO {table_name} ({columns_str}) VALUES ({placeholders})'
+        cursor.execute(query, values)
+    
+    # Commit and close
+    conn.commit()
+    print(f'Successfully imported {len(data)} records to {table_name}')
+    conn.close()
+
+# Import all JSON files
+try:
+    # Import customers data
+    import_json_to_sqlite('customers.json', 'customers')
+    
+    # Import products data
+    import_json_to_sqlite('products.json', 'products')
+    
+    # Import drivers data
+    import_json_to_sqlite('drivers.json', 'drivers')
+    
+    print('All JSON data imported successfully!')
+    
+except Exception as e:
+    print(f'Error importing JSON data: {e}')
+"@
+
+$importJsonScript | Out-File -FilePath "$projectRoot\scripts\import_json_data.py" -Encoding utf8
+
+Write-Host "JSON import script created"
+
+# Create a Python script to add columns to tables
+$addColumnScript = @"
+import sqlite3
+import os
+
+# Set paths
+project_root = r'$projectRoot'.replace('\\', '\\\\')
+db_path = os.path.join(project_root, 'data', 'petroleum_sales.db')
+
+def add_column_to_table(table_name, column_name, column_type):
+    """Add a new column to an existing table"""
+    print(f'Adding column {column_name} to {table_name}...')
+    
+    # Connect to SQLite database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    try:
+        # Check if column already exists
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns = [info[1] for info in cursor.fetchall()]
+        
+        if column_name in columns:
+            print(f'Column {column_name} already exists in {table_name}')
+        else:
+            # Add the new column
+            cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}")
+            conn.commit()
+            print(f'Column {column_name} added successfully to {table_name}')
+    
+    except Exception as e:
+        print(f'Error adding column: {e}')
+    
+    finally:
+        conn.close()
+
+# Example: Add a cost column to the sales table
+add_column_to_table('sales', 'cost', 'REAL')
+
+# Example: Add a profit column to the sales table
+add_column_to_table('sales', 'profit', 'REAL')
+
+print('Column addition completed!')
+"@
+
+$addColumnScript | Out-File -FilePath "$projectRoot\scripts\add_column.py" -Encoding utf8
+
+Write-Host "Add column script created"
+
+# Create a markdown file to track progress
+$progressMarkdown = @"
+# Database Training Progress Tracker
+
+## Module 1: SQLite Database Setup
+
+### Setup Tasks
+- [x] Verify admin rights
+- [x] Create project structure
+- [x] Install SQLite
+- [x] Install Python packages
+
+### Data Preparation
+- [ ] Clean and analyze CSV data
+- [ ] Import CSV data to SQLite
+
+### Database Creation
+- [x] Create database schema
+- [x] Create tables
+- [ ] Import JSON data to tables
+- [ ] Add custom columns
+
+### SQL Practice
+- [ ] Write basic SELECT queries
+- [ ] Filter data with WHERE clauses
+- [ ] Join tables
+- [ ] Create views
+- [ ] Write aggregate queries
+
+## Module 2: Microsoft Access Setup (Upcoming)
+
+### Setup Tasks
+- [ ] Install/verify Microsoft Access
+- [ ] Create a new Access database
+- [ ] Import data from CSV
+- [ ] Create tables and relationships
+
+### Access Features
+- [ ] Create forms
+- [ ] Create reports
+- [ ] Write Access queries
+- [ ] Create macros
+"@
+
+$progressMarkdown | Out-File -FilePath "$projectRoot\docs\progress.md" -Encoding utf8
+
+Write-Host "Progress tracking markdown created"
+
+# Create a placeholder for Module 2
+$module2Placeholder = @"
+# Module 2: Microsoft Access Database Setup
+
+This module will cover setting up the same database structure in Microsoft Access.
+
+## Topics to Cover:
+1. Creating a new Access database
+2. Importing data from CSV and JSON
+3. Creating tables and defining relationships
+4. Creating forms for data entry
+5. Creating reports for data visualization
+6. Writing Access queries
+7. Creating macros for automation
+
+## Prerequisites:
+- Microsoft Access installed (part of Microsoft Office)
+- Completed Module 1
+"@
+
+$module2Placeholder | Out-File -FilePath "$projectRoot\docs\module2_plan.md" -Encoding utf8
+
+Write-Host "Module 2 placeholder created"
+
+Write-Host "`nSetup completed successfully! Your database training environment is ready.`n"
+Write-Host "To get started:"
+Write-Host "1. Navigate to: $projectRoot"
+Write-Host "2. Run the data cleaning script: python $projectRoot\scripts\clean_data.py"
+Write-Host "3. Import the JSON data: python $projectRoot\scripts\import_json_data.py"
+Write-Host "4. Add columns to tables: python $projectRoot\scripts\add_column.py"
+Write-Host "5. Track your progress in: $projectRoot\docs\progress.md"
+Next Steps for Your Training
+Once you've completed the setup, here are the next steps to start your database training:
+
+Data Cleaning and Exploration:
+
+Run the data cleaning script: python scripts\clean_data.py
+Examine the cleaned data to understand its structure
+
+
+Import JSON Data:
+
+Run the JSON import script: python scripts\import_json_data.py
+Verify the data was imported correctly
+
+
+Add Custom Columns:
+
+Run the add column script: python scripts\add_column.py
+Learn to modify and extend the database structure
+
+
+Basic SQL Queries:
+
+Practice SELECT statements to retrieve data
+Filter data with WHERE clauses
+Join tables to combine related data
+
+
+Advanced SQL:
+
+Create views for common queries
+Write aggregate queries with GROUP BY
+Experiment with subqueries and window functions
+
+
+
+When you're ready to start, simply let me know with "Let's begin the training" and I'll guide you through each step in a teaching manner. We'll tackle one concept at a time, ensuring you understand each part before moving on.RetryJcreate the folder with all these files and scripts on my desktop pleasEditI'll guide you through creating the folder structure and all the files using PowerShell. Let's execute this step by step.
+First, let's open PowerShell as an administrator:
+
+Press the Windows key
+Type "PowerShell"
+Right-click on "Windows PowerShell" and select "Run as administrator"
+
+Now, let's run the following PowerShell commands to create your database training environment:
+powershell# Check if running as administrator
+$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+Write-Host "Running as administrator: $isAdmin"
+
+# Create project directory on desktop
+$projectRoot = "$env:USERPROFILE\Desktop\DatabaseTraining"
+New-Item -ItemType Directory -Path $projectRoot -Force
+
+# Create subdirectories
+$directories = @(
+    "$projectRoot\data",
+    "$projectRoot\scripts",
+    "$projectRoot\docs",
+    "$projectRoot\json_data"
+)
+foreach ($dir in $directories) {
+    New-Item -ItemType Directory -Path $dir -Force
+}
+
+Write-Host "Project structure created at $projectRoot"
+After running these commands, you should see a new folder called "DatabaseTraining" on your desktop with the following subfolders:
+
+data
+scripts
+docs
+json_data
+
+Now let's download and set up SQLite:
+powershell# Create a directory for SQLite
+$sqliteDir = "$projectRoot\sqlite"
+New-Item -ItemType Directory -Path $sqliteDir -Force
+
+# Download SQLite
+$sqliteUrl = "https://www.sqlite.org/2023/sqlite-tools-win32-x86-3410200.zip"
+$sqliteZip = "$sqliteDir\sqlite.zip"
+Invoke-WebRequest -Uri $sqliteUrl -OutFile $sqliteZip
+
+# Extract SQLite
+Expand-Archive -Path $sqliteZip -DestinationPath $sqliteDir -Force
+Remove-Item $sqliteZip
+
+Write-Host "SQLite installed successfully"
+Let's check for Python and install required packages:
+powershell# Check if Python is installed
+try {
+    $pythonVersion = python --version
+    Write-Host "Python is already installed: $pythonVersion"
+} catch {
+    Write-Host "Python is not installed. Please install Python from https://www.python.org/downloads/"
+    Write-Host "Be sure to check 'Add Python to PATH' during installation"
+}
+
+# Install required Python packages
+try {
+    python -m pip install --upgrade pip
+    python -m pip install pandas numpy matplotlib seaborn jupyter
+    Write-Host "Python packages installed successfully"
+} catch {
+    Write-Host "Error installing Python packages. Make sure Python is properly installed."
+}
+Now let's create all the script files:
+powershell# Create a Python script for data cleaning
+$dataCleaningScript = @"
+import pandas as pd
+import os
+
+# Set paths
+project_root = r'$projectRoot'.replace('\\', '\\\\')
+data_path = os.path.join(project_root, 'data', 'sales_data.csv')
+clean_data_path = os.path.join(project_root, 'data', 'sales_data_clean.csv')
+
+# Load the data
+print('Loading data...')
+try:
+    df = pd.read_csv(data_path)
+    print('Data loaded successfully!')
+    print(f'Original data shape: {df.shape}')
+    
+    # Display the first few rows
+    print('\nFirst 5 rows of original data:')
+    print(df.head())
+    
+    # Check for missing values
+    print('\nMissing values per column:')
+    print(df.isnull().sum())
+    
+    # Basic data cleaning
+    # Remove any completely empty rows
+    df = df.dropna(how='all')
+    
+    # Handling date columns (assuming there's a date column)
+    date_columns = df.filter(like='date').columns
+    for col in date_columns:
+        df[col] = pd.to_datetime(df[col], errors='coerce')
+    
+    # Convert any numeric columns that might be stored as strings
+    for col in df.columns:
+        if df[col].dtype == 'object':
+            try:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+            except:
+                pass
+    
+    # Save the cleaned data
+    df.to_csv(clean_data_path, index=False)
+    print(f'\nCleaned data saved to: {clean_data_path}')
+    print(f'Cleaned data shape: {df.shape}')
+    
+except Exception as e:
+    print(f'Error processing data: {e}')
+"@
+
+$dataCleaningScript | Out-File -FilePath "$projectRoot\scripts\clean_data.py" -Encoding utf8
+
+Write-Host "Data cleaning script created"
+
+# Create a SQL script for database setup
+$dbSetupScript = @"
+-- Create database tables
+CREATE TABLE IF NOT EXISTS customers (
+    customer_id INTEGER PRIMARY KEY,
+    customer_name TEXT NOT NULL,
+    contact_person TEXT,
+    email TEXT,
+    phone TEXT,
+    address TEXT,
+    city TEXT,
+    state TEXT,
+    zip_code TEXT,
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS products (
+    product_id INTEGER PRIMARY KEY,
+    product_name TEXT NOT NULL,
+    category TEXT,
+    unit_price REAL NOT NULL,
+    unit_cost REAL NOT NULL,
+    description TEXT,
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sales (
+    sale_id INTEGER PRIMARY KEY,
+    customer_id INTEGER,
+    product_id INTEGER,
+    sale_date TEXT NOT NULL,
+    quantity REAL NOT NULL,
+    total_amount REAL NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
+    FOREIGN KEY (product_id) REFERENCES products (product_id)
+);
+
+CREATE TABLE IF NOT EXISTS drivers (
+    driver_id INTEGER PRIMARY KEY,
+    driver_name TEXT NOT NULL,
+    license_number TEXT,
+    hire_date TEXT,
+    status TEXT CHECK(status IN ('Active', 'Inactive', 'On Leave')),
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS deliveries (
+    delivery_id INTEGER PRIMARY KEY,
+    sale_id INTEGER,
+    driver_id INTEGER,
+    delivery_date TEXT,
+    status TEXT CHECK(status IN ('Scheduled', 'In Transit', 'Delivered', 'Failed')),
+    notes TEXT,
+    FOREIGN KEY (sale_id) REFERENCES sales (sale_id),
+    FOREIGN KEY (driver_id) REFERENCES drivers (driver_id)
+);
+"@
+
+$dbSetupScript | Out-File -FilePath "$projectRoot\scripts\create_database.sql" -Encoding utf8
+
+Write-Host "Database setup script created"
+Let's create the JSON sample data files:
+powershell# Create sample customer data in JSON format
+$customersJson = @"
+[
+  {
+    "customer_id": 1,
+    "customer_name": "Acme Trucking",
+    "contact_person": "John Doe",
+    "email": "john.doe@acmetrucking.com",
+    "phone": "555-123-4567",
+    "address": "123 Main St",
+    "city": "Denver",
+    "state": "CO",
+    "zip_code": "80014"
+  },
+  {
+    "customer_id": 2,
+    "customer_name": "Mountain Delivery Services",
+    "contact_person": "Jane Smith",
+    "email": "jane.smith@mountaindelivery.com",
+    "phone": "555-987-6543",
+    "address": "456 Pine Ave",
+    "city": "Boulder",
+    "state": "CO",
+    "zip_code": "80302"
+  },
+  {
+    "customer_id": 3,
+    "customer_name": "Western Freight LLC",
+    "contact_person": "Bob Johnson",
+    "email": "bob@westernfreight.com",
+    "phone": "555-456-7890",
+    "address": "789 Oak Blvd",
+    "city": "Fort Collins",
+    "state": "CO",
+    "zip_code": "80525"
+  },
+  {
+    "customer_id": 4,
+    "customer_name": "Rocky Mountain Transport",
+    "contact_person": "Sarah Williams",
+    "email": "sarah@rmtransport.com",
+    "phone": "555-789-0123",
+    "address": "101 River Rd",
+    "city": "Pueblo",
+    "state": "CO",
+    "zip_code": "81001"
+  },
+  {
+    "customer_id": 5,
+    "customer_name": "Colorado Express",
+    "contact_person": "Mike Brown",
+    "email": "mike@coloradoexpress.com",
+    "phone": "555-321-6547",
+    "address": "202 Mountain View Dr",
+    "city": "Colorado Springs",
+    "state": "CO",
+    "zip_code": "80903"
+  }
+]
+"@
+
+$customersJson | Out-File -FilePath "$projectRoot\json_data\customers.json" -Encoding utf8
+
+# Create sample product data in JSON format
+$productsJson = @"
+[
+  {
+    "product_id": 1,
+    "product_name": "Regular Unleaded Gasoline",
+    "category": "Fuel",
+    "unit_price": 3.45,
+    "unit_cost": 2.75,
+    "description": "87 octane unleaded gasoline"
+  },
+  {
+    "product_id": 2,
+    "product_name": "Premium Unleaded Gasoline",
+    "category": "Fuel",
+    "unit_price": 3.85,
+    "unit_cost": 3.15,
+    "description": "91 octane unleaded gasoline"
+  },
+  {
+    "product_id": 3,
+    "product_name": "Diesel Fuel",
+    "category": "Fuel",
+    "unit_price": 3.65,
+    "unit_cost": 2.95,
+    "description": "Standard diesel fuel for trucks and equipment"
+  },
+  {
+    "product_id": 4,
+    "product_name": "Bio-Diesel Blend",
+    "category": "Fuel",
+    "unit_price": 3.75,
+    "unit_cost": 3.05,
+    "description": "B20 bio-diesel blend"
+  },
+  {
+    "product_id": 5,
+    "product_name": "Engine Oil 10W-30",
+    "category": "Lubricant",
+    "unit_price": 25.99,
+    "unit_cost": 18.50,
+    "description": "5 quart container of 10W-30 engine oil"
+  },
+  {
+    "product_id": 6,
+    "product_name": "Transmission Fluid",
+    "category": "Lubricant",
+    "unit_price": 22.99,
+    "unit_cost": 16.25,
+    "description": "Automatic transmission fluid, 1 gallon"
+  },
+  {
+    "product_id": 7,
+    "product_name": "Propane",
+    "category": "Fuel",
+    "unit_price": 2.99,
+    "unit_cost": 2.15,
+    "description": "Propane by the gallon for heating and equipment"
+  }
+]
+"@
+
+$productsJson | Out-File -FilePath "$projectRoot\json_data\products.json" -Encoding utf8
+
+# Create sample driver data in JSON format
+$driversJson = @"
+[
+  {
+    "driver_id": 1,
+    "driver_name": "Michael Johnson",
+    "license_number": "CDL12345CO",
+    "hire_date": "2020-03-15",
+    "status": "Active"
+  },
+  {
+    "driver_id": 2,
+    "driver_name": "Robert Garcia",
+    "license_number": "CDL67890CO",
+    "hire_date": "2018-07-22",
+    "status": "Active"
+  },
+  {
+    "driver_id": 3,
+    "driver_name": "David Martinez",
+    "license_number": "CDL24680CO",
+    "hire_date": "2021-01-10",
+    "status": "Active"
+  },
+  {
+    "driver_id": 4,
+    "driver_name": "James Wilson",
+    "license_number": "CDL13579CO",
+    "hire_date": "2019-05-03",
+    "status": "On Leave"
+  },
+  {
+    "driver_id": 5,
+    "driver_name": "Thomas Anderson",
+    "license_number": "CDL97531CO",
+    "hire_date": "2017-11-28",
+    "status": "Active"
+  },
+  {
+    "driver_id": 6,
+    "driver_name": "Christopher Lee",
+    "license_number": "CDL86420CO",
+    "hire_date": "2022-02-14",
+    "status": "Active"
+  },
+  {
+    "driver_id": 7,
+    "driver_name": "Daniel Brown",
+    "license_number": "CDL11223CO",
+    "hire_date": "2020-09-01",
+    "status": "Inactive"
+  }
+]
+"@
+
+$driversJson | Out-File -FilePath "$projectRoot\json_data\drivers.json" -Encoding utf8
+
+Write-Host "Sample JSON data created successfully"
+Let's create the Python scripts for database operations:
+powershell# Create a Python script to import JSON data to SQLite
+$importJsonScript = @"
+import json
+import sqlite3
+import os
+
+# Set paths
+project_root = r'$projectRoot'.replace('\\', '\\\\')
+db_path = os.path.join(project_root, 'data', 'petroleum_sales.db')
+json_dir = os.path.join(project_root, 'json_data')
+
+def import_json_to_sqlite(json_file, table_name):
+    """Import data from a JSON file to a SQLite table"""
+    print(f'Importing {json_file} to {table_name}...')
+    
+    # Load JSON data
+    with open(os.path.join(json_dir, json_file), 'r') as f:
+        data = json.load(f)
+    
+    if not data:
+        print(f'No data found in {json_file}')
+        return
+    
+    # Connect to SQLite database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # Get the first item's keys to use as column names
+    columns = list(data[0].keys())
+    
+    # Insert data into table
+    for item in data:
+        placeholders = ', '.join(['?'] * len(item))
+        columns_str = ', '.join(columns)
+        values = [item[column] for column in columns]
+        
+        query = f'INSERT INTO {table_name} ({columns_str}) VALUES ({placeholders})'
+        cursor.execute(query, values)
+    
+    # Commit and close
+    conn.commit()
+    print(f'Successfully imported {len(data)} records to {table_name}')
+    conn.close()
+
+# Import all JSON files
+try:
+    # Import customers data
+    import_json_to_sqlite('customers.json', 'customers')
+    
+    # Import products data
+    import_json_to_sqlite('products.json', 'products')
+    
+    # Import drivers data
+    import_json_to_sqlite('drivers.json', 'drivers')
+    
+    print('All JSON data imported successfully!')
+    
+except Exception as e:
+    print(f'Error importing JSON data: {e}')
+"@
+
+$importJsonScript | Out-File -FilePath "$projectRoot\scripts\import_json_data.py" -Encoding utf8
+
+Write-Host "JSON import script created"
+
+# Create a Python script to add columns to tables
+$addColumnScript = @"
+import sqlite3
+import os
+
+# Set paths
+project_root = r'$projectRoot'.replace('\\', '\\\\')
+db_path = os.path.join(project_root, 'data', 'petroleum_sales.db')
+
+def add_column_to_table(table_name, column_name, column_type):
+    """Add a new column to an existing table"""
+    print(f'Adding column {column_name} to {table_name}...')
+    
+    # Connect to SQLite database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    try:
+        # Check if column already exists
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns = [info[1] for info in cursor.fetchall()]
+        
+        if column_name in columns:
+            print(f'Column {column_name} already exists in {table_name}')
+        else:
+            # Add the new column
+            cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}")
+            conn.commit()
+            print(f'Column {column_name} added successfully to {table_name}')
+    
+    except Exception as e:
+        print(f'Error adding column: {e}')
+    
+    finally:
+        conn.close()
+
+# Example: Add a cost column to the sales table
+add_column_to_table('sales', 'cost', 'REAL')
+
+# Example: Add a profit column to the sales table
+add_column_to_table('sales', 'profit', 'REAL')
+
+print('Column addition completed!')
+"@
+
+$addColumnScript | Out-File -FilePath "$projectRoot\scripts\add_column.py" -Encoding utf8
+
+Write-Host "Add column script created"
+Finally, let's create the documentation files:
+powershell# Create a markdown file to track progress
+$progressMarkdown = @"
+# Database Training Progress Tracker
+
+## Module 1: SQLite Database Setup
+
+### Setup Tasks
+- [x] Verify admin rights
+- [x] Create project structure
+- [x] Install SQLite
+- [x] Install Python packages
+
+### Data Preparation
+- [ ] Clean and analyze CSV data
+- [ ] Import CSV data to SQLite
+
+### Database Creation
+- [x] Create database schema
+- [x] Create tables
+- [ ] Import JSON data to tables
+- [ ] Add custom columns
+
+### SQL Practice
+- [ ] Write basic SELECT queries
+- [ ] Filter data with WHERE clauses
+- [ ] Join tables
+- [ ] Create views
+- [ ] Write aggregate queries
+
+## Module 2: Microsoft Access Setup (Upcoming)
+
+### Setup Tasks
+- [ ] Install/verify Microsoft Access
+- [ ] Create a new Access database
+- [ ] Import data from CSV
+- [ ] Create tables and relationships
+
+### Access Features
+- [ ] Create forms
+- [ ] Create reports
+- [ ] Write Access queries
+- [ ] Create macros
+"@
+
+$progressMarkdown | Out-File -FilePath "$projectRoot\docs\progress.md" -Encoding utf8
+
+Write-Host "Progress tracking markdown created"
+
+# Create a placeholder for Module 2
+$module2Placeholder = @"
+# Module 2: Microsoft Access Database Setup
+
+This module will cover setting up the same database structure in Microsoft Access.
+
+## Topics to Cover:
+1. Creating a new Access database
+2. Importing data from CSV and JSON
+3. Creating tables and defining relationships
+4. Creating forms for data entry
+5. Creating reports for data visualization
+6. Writing Access queries
+7. Creating macros for automation
+
+## Prerequisites:
+- Microsoft Access installed (part of Microsoft Office)
+- Completed Module 1
+"@
+
+$module2Placeholder | Out-File -FilePath "$projectRoot\docs\module2_plan.md" -Encoding utf8
+
+Write-Host "Module 2 placeholder created"
+Now let's initialize the database:
+powershell# Create the database and execute the setup script
+$sqliteExe = Get-ChildItem -Path $sqliteDir -Filter "sqlite3.exe" -Recurse | Select-Object -First 1 -ExpandProperty FullName
+$dbPath = "$projectRoot\data\petroleum_sales.db"
+
+# Create an empty file first
+New-Item -ItemType File -Path $dbPath -Force
+
+# Execute the SQL script
+cmd /c "$sqliteExe $dbPath < $projectRoot\scripts\create_database.sql"
+
+Write-Host "Database created successfully at $dbPath"
+Let's copy your CSV file:
+powershell# Try to copy the CSV file to our data directory
+try {
+    $csvPath = "Copy of Final Sales Report 2425 Data 1.csv"
+    # Check if the file exists in the current directory
+    if (Test-Path $csvPath) {
+        Copy-Item -Path $csvPath -Destination "$projectRoot\data\sales_data.csv" -Force
+        Write-Host "Sales data copied to project folder"
+    } else {
+        # Create a placeholder file if the original CSV is not found
+        @"
+Date,Customer,Product,Quantity,Price,Total
+2024-01-15,Acme Trucking,Diesel Fuel,500,3.65,1825.00
+2024-01-16,Mountain Delivery Services,Regular Unleaded Gasoline,350,3.45,1207.50
+2024-01-17,Western Freight LLC,Diesel Fuel,800,3.65,2920.00
+2024-01-18,Rocky Mountain Transport,Premium Unleaded Gasoline,200,3.85,770.00
+2024-01-19,Colorado Express,Diesel Fuel,600,3.65,2190.00
+"@ | Out-File -FilePath "$projectRoot\data\sales_data.csv" -Encoding utf8
+        Write-Host "Created sample sales data file"
+    }
+} catch {
+    Write-Host "Error copying or creating sales data: $_"
+}
+Let's wrap up and display completion message:
+powershellWrite-Host "`nSetup completed successfully! Your database training environment is ready.`n"
+Write-Host "To get started:"
+Write-Host "1. Navigate to: $projectRoot"
+Write-Host "2. Run the data cleaning script: python $projectRoot\scripts\clean_data.py"
+Write-Host "3. Import the JSON data: python $projectRoot\scripts\import_json_data.py"
+Write-Host "4. Add columns to tables: python $projectRoot\scripts\add_column.py"
+Write-Host "5. Track your progress in: $projectRoot\docs\progress.md"
+All the files and folders have now been created on your desktop in the "DatabaseTraining" folder. You have:
+
+A project structure with data, scripts, docs, and json_data directories
+SQLite installed in the sqlite directory
+Python scripts for:
+
+Data cleaning and preparation
+Importing JSON data to SQLite
+Adding columns to tables
+
+
+Sample JSON data files for customers, products, and drivers
+Documentation files for tracking progress
+A SQLite database with tables created and ready for data
+
+The environment is now set up for your database training. You can now start working through the modules by following the instructions in the progress.md file. Let me know when you're ready to begin the training, and I'll guide you through each step!RetryJwhich versionEditI see you're looking at PowerShell 7 (x64) in the Windows search results. For our database training setup, we'll need to run PowerShell as administrator to ensure we have the proper permissions for installing and configuring the database environment.
+To start the setup process:
+
+Click on "Run as Administrator" in that menu you have open
+Once PowerShell opens, you can copy and paste the commands I provided in my previous message to create the database training environment
+
+PowerShell 7 (x64) is actually perfect for our task as it's the newer version with improved features and better error handling compared to the older Windows PowerShell. This version will work great for executing all the scripts we need to set up your database training environment.
+Would you like me to provide the commands again in smaller chunks so they're easier to copy and paste into PowerShell? Or do you have any specific questions about the PowerShell version or the setup process?RetryJrewrite scripts this is root it was never defned C:\Users\jacob\Desktop\DatabaseTrainingEditI see the issue - the root variable wasn't properly defined. Let me rewrite all the scripts with the correct path definition using "C:\Users\jacob\Desktop\DatabaseTraining" as the root. I'll break it down into smaller, manageable chunks for you to copy and paste.
+Step 1: Check Admin Rights and Create Folders
+powershell# Check if running as administrator
+$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+Write-Host "Running as administrator: $isAdmin"
+
+# Define project root explicitly
+$projectRoot = "C:\Users\jacob\Desktop\DatabaseTraining"
+Write-Host "Project root set to: $projectRoot"
+
+# Create project directory on desktop
+New-Item -ItemType Directory -Path $projectRoot -Force
+
+# Create subdirectories
+$directories = @(
+    "$projectRoot\data",
+    "$projectRoot\scripts",
+    "$projectRoot\docs",
+    "$projectRoot\json_data"
+)
+foreach ($dir in $directories) {
+    New-Item -ItemType Directory -Path $dir -Force
+}
+
+Write-Host "Project structure created at $projectRoot"
+Step 2: Download and Install SQLite
+powershell# Create a directory for SQLite
+$sqliteDir = "$projectRoot\sqlite"
+New-Item -ItemType Directory -Path $sqliteDir -Force
+
+# Download SQLite
+$sqliteUrl = "https://www.sqlite.org/2023/sqlite-tools-win32-x86-3410200.zip"
+$sqliteZip = "$sqliteDir\sqlite.zip"
+Invoke-WebRequest -Uri $sqliteUrl -OutFile $sqliteZip
+
+# Extract SQLite
+Expand-Archive -Path $sqliteZip -DestinationPath $sqliteDir -Force
+Remove-Item $sqliteZip
+
+Write-Host "SQLite installed successfully"
+
+# Check if Python is installed
+try {
+    $pythonVersion = python --version
+    Write-Host "Python is already installed: $pythonVersion"
+} catch {
+    Write-Host "Python is not installed. Please install Python from https://www.python.org/downloads/"
+    Write-Host "Be sure to check 'Add Python to PATH' during installation"
+}
+
+# Install required Python packages
+try {
+    python -m pip install --upgrade pip
+    python -m pip install pandas numpy matplotlib seaborn jupyter
+    Write-Host "Python packages installed successfully"
+} catch {
+    Write-Host "Error installing Python packages. Make sure Python is properly installed."
+}
+Step 3: Create Data Cleaning Script
+powershell# Create a Python script for data cleaning
+$dataCleaningScript = @"
+import pandas as pd
+import os
+
+# Set paths
+project_root = r'C:\Users\jacob\Desktop\DatabaseTraining'
+data_path = os.path.join(project_root, 'data', 'sales_data.csv')
+clean_data_path = os.path.join(project_root, 'data', 'sales_data_clean.csv')
+
+# Load the data
+print('Loading data...')
+try:
+    df = pd.read_csv(data_path)
+    print('Data loaded successfully!')
+    print(f'Original data shape: {df.shape}')
+    
+    # Display the first few rows
+    print('\nFirst 5 rows of original data:')
+    print(df.head())
+    
+    # Check for missing values
+    print('\nMissing values per column:')
+    print(df.isnull().sum())
+    
+    # Basic data cleaning
+    # Remove any completely empty rows
+    df = df.dropna(how='all')
+    
+    # Handling date columns (assuming there's a date column)
+    date_columns = df.filter(like='date').columns
+    for col in date_columns:
+        df[col] = pd.to_datetime(df[col], errors='coerce')
+    
+    # Convert any numeric columns that might be stored as strings
+    for col in df.columns:
+        if df[col].dtype == 'object':
+            try:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+            except:
+                pass
+    
+    # Save the cleaned data
+    df.to_csv(clean_data_path, index=False)
+    print(f'\nCleaned data saved to: {clean_data_path}')
+    print(f'Cleaned data shape: {df.shape}')
+    
+except Exception as e:
+    print(f'Error processing data: {e}')
+"@
+
+$dataCleaningScript | Out-File -FilePath "$projectRoot\scripts\clean_data.py" -Encoding utf8
+
+Write-Host "Data cleaning script created"
+Step 4: Create Database Schema Script
+powershell# Create a SQL script for database setup
+$dbSetupScript = @"
+-- Create database tables
+CREATE TABLE IF NOT EXISTS customers (
+    customer_id INTEGER PRIMARY KEY,
+    customer_name TEXT NOT NULL,
+    contact_person TEXT,
+    email TEXT,
+    phone TEXT,
+    address TEXT,
+    city TEXT,
+    state TEXT,
+    zip_code TEXT,
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS products (
+    product_id INTEGER PRIMARY KEY,
+    product_name TEXT NOT NULL,
+    category TEXT,
+    unit_price REAL NOT NULL,
+    unit_cost REAL NOT NULL,
+    description TEXT,
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sales (
+    sale_id INTEGER PRIMARY KEY,
+    customer_id INTEGER,
+    product_id INTEGER,
+    sale_date TEXT NOT NULL,
+    quantity REAL NOT NULL,
+    total_amount REAL NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
+    FOREIGN KEY (product_id) REFERENCES products (product_id)
+);
+
+CREATE TABLE IF NOT EXISTS drivers (
+    driver_id INTEGER PRIMARY KEY,
+    driver_name TEXT NOT NULL,
+    license_number TEXT,
+    hire_date TEXT,
+    status TEXT CHECK(status IN ('Active', 'Inactive', 'On Leave')),
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS deliveries (
+    delivery_id INTEGER PRIMARY KEY,
+    sale_id INTEGER,
+    driver_id INTEGER,
+    delivery_date TEXT,
+    status TEXT CHECK(status IN ('Scheduled', 'In Transit', 'Delivered', 'Failed')),
+    notes TEXT,
+    FOREIGN KEY (sale_id) REFERENCES sales (sale_id),
+    FOREIGN KEY (driver_id) REFERENCES drivers (driver_id)
+);
+"@
+
+$dbSetupScript | Out-File -FilePath "$projectRoot\scripts\create_database.sql" -Encoding utf8
+
+Write-Host "Database setup script created"
+Step 5: Create Sample JSON Data
+powershell# Create sample customer data in JSON format
+$customersJson = @"
+[
+  {
+    "customer_id": 1,
+    "customer_name": "Acme Trucking",
+    "contact_person": "John Doe",
+    "email": "john.doe@acmetrucking.com",
+    "phone": "555-123-4567",
+    "address": "123 Main St",
+    "city": "Denver",
+    "state": "CO",
+    "zip_code": "80014"
+  },
+  {
+    "customer_id": 2,
+    "customer_name": "Mountain Delivery Services",
+    "contact_person": "Jane Smith",
+    "email": "jane.smith@mountaindelivery.com",
+    "phone": "555-987-6543",
+    "address": "456 Pine Ave",
+    "city": "Boulder",
+    "state": "CO",
+    "zip_code": "80302"
+  },
+  {
+    "customer_id": 3,
+    "customer_name": "Western Freight LLC",
+    "contact_person": "Bob Johnson",
+    "email": "bob@westernfreight.com",
+    "phone": "555-456-7890",
+    "address": "789 Oak Blvd",
+    "city": "Fort Collins",
+    "state": "CO",
+    "zip_code": "80525"
+  },
+  {
+    "customer_id": 4,
+    "customer_name": "Rocky Mountain Transport",
+    "contact_person": "Sarah Williams",
+    "email": "sarah@rmtransport.com",
+    "phone": "555-789-0123",
+    "address": "101 River Rd",
+    "city": "Pueblo",
+    "state": "CO",
+    "zip_code": "81001"
+  },
+  {
+    "customer_id": 5,
+    "customer_name": "Colorado Express",
+    "contact_person": "Mike Brown",
+    "email": "mike@coloradoexpress.com",
+    "phone": "555-321-6547",
+    "address": "202 Mountain View Dr",
+    "city": "Colorado Springs",
+    "state": "CO",
+    "zip_code": "80903"
+  }
+]
+"@
+
+$customersJson | Out-File -FilePath "$projectRoot\json_data\customers.json" -Encoding utf8
+
+# Create sample product data in JSON format
+$productsJson = @"
+[
+  {
+    "product_id": 1,
+    "product_name": "Regular Unleaded Gasoline",
+    "category": "Fuel",
+    "unit_price": 3.45,
+    "unit_cost": 2.75,
+    "description": "87 octane unleaded gasoline"
+  },
+  {
+    "product_id": 2,
+    "product_name": "Premium Unleaded Gasoline",
+    "category": "Fuel",
+    "unit_price": 3.85,
+    "unit_cost": 3.15,
+    "description": "91 octane unleaded gasoline"
+  },
+  {
+    "product_id": 3,
+    "product_name": "Diesel Fuel",
+    "category": "Fuel",
+    "unit_price": 3.65,
+    "unit_cost": 2.95,
+    "description": "Standard diesel fuel for trucks and equipment"
+  },
+  {
+    "product_id": 4,
+    "product_name": "Bio-Diesel Blend",
+    "category": "Fuel",
+    "unit_price": 3.75,
+    "unit_cost": 3.05,
+    "description": "B20 bio-diesel blend"
+  },
+  {
+    "product_id": 5,
+    "product_name": "Engine Oil 10W-30",
+    "category": "Lubricant",
+    "unit_price": 25.99,
+    "unit_cost": 18.50,
+    "description": "5 quart container of 10W-30 engine oil"
+  },
+  {
+    "product_id": 6,
+    "product_name": "Transmission Fluid",
+    "category": "Lubricant",
+    "unit_price": 22.99,
+    "unit_cost": 16.25,
+    "description": "Automatic transmission fluid, 1 gallon"
+  },
+  {
+    "product_id": 7,
+    "product_name": "Propane",
+    "category": "Fuel",
+    "unit_price": 2.99,
+    "unit_cost": 2.15,
+    "description": "Propane by the gallon for heating and equipment"
+  }
+]
+"@
+
+$productsJson | Out-File -FilePath "$projectRoot\json_data\products.json" -Encoding utf8
+Step 6: Create Drivers JSON Data
+powershell# Create sample driver data in JSON format
+$driversJson = @"
+[
+  {
+    "driver_id": 1,
+    "driver_name": "Michael Johnson",
+    "license_number": "CDL12345CO",
+    "hire_date": "2020-03-15",
+    "status": "Active"
+  },
+  {
+    "driver_id": 2,
+    "driver_name": "Robert Garcia",
+    "license_number": "CDL67890CO",
+    "hire_date": "2018-07-22",
+    "status": "Active"
+  },
+  {
+    "driver_id": 3,
+    "driver_name": "David Martinez",
+    "license_number": "CDL24680CO",
+    "hire_date": "2021-01-10",
+    "status": "Active"
+  },
+  {
+    "driver_id": 4,
+    "driver_name": "James Wilson",
+    "license_number": "CDL13579CO",
+    "hire_date": "2019-05-03",
+    "status": "On Leave"
+  },
+  {
+    "driver_id": 5,
+    "driver_name": "Thomas Anderson",
+    "license_number": "CDL97531CO",
+    "hire_date": "2017-11-28",
+    "status": "Active"
+  },
+  {
+    "driver_id": 6,
+    "driver_name": "Christopher Lee",
+    "license_number": "CDL86420CO",
+    "hire_date": "2022-02-14",
+    "status": "Active"
+  },
+  {
+    "driver_id": 7,
+    "driver_name": "Daniel Brown",
+    "license_number": "CDL11223CO",
+    "hire_date": "2020-09-01",
+    "status": "Inactive"
+  }
+]
+"@
+
+$driversJson | Out-File -FilePath "$projectRoot\json_data\drivers.json" -Encoding utf8
+
+Write-Host "Sample JSON data created successfully"
+Step 7: Create Import JSON Script
+powershell# Create a Python script to import JSON data to SQLite
+$importJsonScript = @"
+import json
+import sqlite3
+import os
+
+# Set paths
+project_root = r'C:\Users\jacob\Desktop\DatabaseTraining'
+db_path = os.path.join(project_root, 'data', 'petroleum_sales.db')
+json_dir = os.path.join(project_root, 'json_data')
+
+def import_json_to_sqlite(json_file, table_name):
+    """Import data from a JSON file to a SQLite table"""
+    print(f'Importing {json_file} to {table_name}...')
+    
+    # Load JSON data
+    with open(os.path.join(json_dir, json_file), 'r') as f:
+        data = json.load(f)
+    
+    if not data:
+        print(f'No data found in {json_file}')
+        return
+    
+    # Connect to SQLite database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # Get the first item's keys to use as column names
+    columns = list(data[0].keys())
+    
+    # Insert data into table
+    for item in data:
+        placeholders = ', '.join(['?'] * len(item))
+        columns_str = ', '.join(columns)
+        values = [item[column] for column in columns]
+        
+        query = f'INSERT INTO {table_name} ({columns_str}) VALUES ({placeholders})'
+        cursor.execute(query, values)
+    
+    # Commit and close
+    conn.commit()
+    print(f'Successfully imported {len(data)} records to {table_name}')
+    conn.close()
+
+# Import all JSON files
+try:
+    # Import customers data
+    import_json_to_sqlite('customers.json', 'customers')
+    
+    # Import products data
+    import_json_to_sqlite('products.json', 'products')
+    
+    # Import drivers data
+    import_json_to_sqlite('drivers.json', 'drivers')
+    
+    print('All JSON data imported successfully!')
+    
+except Exception as e:
+    print(f'Error importing JSON data: {e}')
+"@
+
+$importJsonScript | Out-File -FilePath "$projectRoot\scripts\import_json_data.py" -Encoding utf8
+
+Write-Host "JSON import script created"
+Step 8: Create Add Column Script
+powershell# Create a Python script to add columns to tables
+$addColumnScript = @"
+import sqlite3
+import os
+
+# Set paths
+project_root = r'C:\Users\jacob\Desktop\DatabaseTraining'
+db_path = os.path.join(project_root, 'data', 'petroleum_sales.db')
+
+def add_column_to_table(table_name, column_name, column_type):
+    """Add a new column to an existing table"""
+    print(f'Adding column {column_name} to {table_name}...')
+    
+    # Connect to SQLite database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    try:
+        # Check if column already exists
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns = [info[1] for info in cursor.fetchall()]
+        
+        if column_name in columns:
+            print(f'Column {column_name} already exists in {table_name}')
+        else:
+            # Add the new column
+            cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}")
+            conn.commit()
+            print(f'Column {column_name} added successfully to {table_name}')
+    
+    except Exception as e:
+        print(f'Error adding column: {e}')
+    
+    finally:
+        conn.close()
+
+# Example: Add a cost column to the sales table
+add_column_to_table('sales', 'cost', 'REAL')
+
+# Example: Add a profit column to the sales table
+add_column_to_table('sales', 'profit', 'REAL')
+
+print('Column addition completed!')
+"@
+
+$addColumnScript | Out-File -FilePath "$projectRoot\scripts\add_column.py" -Encoding utf8
+
+Write-Host "Add column script created"
+Step 9: Create Documentation Files
+powershell# Create a markdown file to track progress
+$progressMarkdown = @"
+# Database Training Progress Tracker
+
+## Module 1: SQLite Database Setup
+
+### Setup Tasks
+- [x] Verify admin rights
+- [x] Create project structure
+- [x] Install SQLite
+- [x] Install Python packages
+
+### Data Preparation
+- [ ] Clean and analyze CSV data
+- [ ] Import CSV data to SQLite
+
+### Database Creation
+- [x] Create database schema
+- [x] Create tables
+- [ ] Import JSON data to tables
+- [ ] Add custom columns
+
+### SQL Practice
+- [ ] Write basic SELECT queries
+- [ ] Filter data with WHERE clauses
+- [ ] Join tables
+- [ ] Create views
+- [ ] Write aggregate queries
+
+## Module 2: Microsoft Access Setup (Upcoming)
+
+### Setup Tasks
+- [ ] Install/verify Microsoft Access
+- [ ] Create a new Access database
+- [ ] Import data from CSV
+- [ ] Create tables and relationships
+
+### Access Features
+- [ ] Create forms
+- [ ] Create reports
+- [ ] Write Access queries
+- [ ] Create macros
+"@
+
+$progressMarkdown | Out-File -FilePath "$projectRoot\docs\progress.md" -Encoding utf8
+
+Write-Host "Progress tracking markdown created"
+
+# Create a placeholder for Module 2
+$module2Placeholder = @"
+# Module 2: Microsoft Access Database Setup
+
+This module will cover setting up the same database structure in Microsoft Access.
+
+## Topics to Cover:
+1. Creating a new Access database
+2. Importing data from CSV and JSON
+3. Creating tables and defining relationships
+4. Creating forms for data entry
+5. Creating reports for data visualization
+6. Writing Access queries
+7. Creating macros for automation
+
+## Prerequisites:
+- Microsoft Access installed (part of Microsoft Office)
+- Completed Module 1
+"@
+
+$module2Placeholder | Out-File -FilePath "$projectRoot\docs\module2_plan.md" -Encoding utf8
+
+Write-Host "Module 2 placeholder created"
+Step 10: Initialize Database and Sample Data
+powershell# Create the database and execute the setup script
+$sqliteExe = Get-ChildItem -Path "$projectRoot\sqlite" -Filter "sqlite3.exe" -Recurse | Select-Object -First 1 -ExpandProperty FullName
+$dbPath = "$projectRoot\data\petroleum_sales.db"
+
+# Create an empty file first
+New-Item -ItemType File -Path $dbPath -Force
+
+# Execute the SQL script
+if ($sqliteExe) {
+    cmd /c "$sqliteExe $dbPath < $projectRoot\scripts\create_database.sql"
+    Write-Host "Database created successfully at $dbPath"
+} else {
+    Write-Host "SQLite executable not found. Database creation skipped."
+}
+
+# Try to copy or create the CSV file
+try {
+    $csvPath = "Copy of Final Sales Report 2425 Data 1.csv"
+    # Check if the file exists in the current directory
+    if (Test-Path $csvPath) {
+        Copy-Item -Path $csvPath -Destination "$projectRoot\data\sales_data.csv" -Force
+        Write-Host "Sales data copied to project folder"
+    } else {
+        # Create a placeholder file if the original CSV is not found
+        @"
+Date,Customer,Product,Quantity,Price,Total
+2024-01-15,Acme Trucking,Diesel Fuel,500,3.65,1825.00
+2024-01-16,Mountain Delivery Services,Regular Unleaded Gasoline,350,3.45,1207.50
+2024-01-17,Western Freight LLC,Diesel Fuel,800,3.65,2920.00
+2024-01-18,Rocky Mountain Transport,Premium Unleaded Gasoline,200,3.85,770.00
+2024-01-19,Colorado Express,Diesel Fuel,600,3.65,2190.00
+"@ | Out-File -FilePath "$projectRoot\data\sales_data.csv" -Encoding utf8
+        Write-Host "Created sample sales data file"
+    }
+} catch {
+    Write-Host "Error copying or creating sales data: $_"
+}
+
+Write-Host "`nSetup completed successfully! Your database training environment is ready.`n"
+Write-Host "To get started:"
+Write-Host "1. Navigate to: $projectRoot"
+Write-Host "2. Run the data cleaning script: python $projectRoot\scripts\clean_data.py"
+Write-Host "3. Import the JSON data: python $projectRoot\scripts\import_json_data.py"
+Write-Host "4. Add columns to tables: python $projectRoot\scripts\add_column.py"
+Write-Host "5. Track your progress in: $projectRoot\docs\progress.md"
+These scripts have been revised with the correct path: "C:\Users\jacob\Desktop\DatabaseTraining". The scripts are broken down into manageable chunks that you can copy and paste one at a time into your PowerShell window.
+Each section is self-contained, so you can run them sequentially. After running all sections, you'll have a complete database training environment set up on your desktop.RetryJwhats nextEditNext Steps for Your Database Training
+Now that you've set up your database training environment, let's start working with it. I'll guide you through the following steps as if we're in a classroom setting:
+Module 1.1: Data Cleaning and Database Setup
+Step 1: Analyze and Clean Your CSV Data
+First, let's run the data cleaning script to prepare your sales data:
+
+Open PowerShell (doesn't need to be admin mode for this part)
+Navigate to your project directory:
+
+cd C:\Users\jacob\Desktop\DatabaseTraining
+
+Run the data cleaning script:
+
+python scripts\clean_data.py
+This script will:
+
+Load your CSV data
+Show basic statistics and the first few rows
+Check for missing values
+Clean the data
+Save a cleaned version in the data folder
+
+Review the output to understand what the script did to your data.
+Step 2: Import JSON Data to SQLite
+Now, let's populate the database with our sample JSON data:
+python scripts\import_json_data.py
+This will import the customers, products, and drivers data into your SQLite database.
+Step 3: Add Custom Columns to the Sales Table
+Next, let's add new columns to the sales table:
+python scripts\add_column.py
+This will add 'cost' and 'profit' columns to your sales table, which we'll use later for calculations.
+Module 1.2: Learning Basic SQL Queries
+Now that our database is set up, let's learn some basic SQL queries. We'll use the SQLite command-line tool for this:
+
+Navigate to your SQLite directory and start the SQLite shell:
+
+cd C:\Users\jacob\Desktop\DatabaseTraining\sqlite
+.\sqlite3.exe ..\data\petroleum_sales.db
+
+Once in the SQLite shell, try these basic commands:
+
+sql-- Show all tables in the database
+.tables
+
+-- See the structure of a table
+.schema customers
+
+-- Display results in a tabular format
+.mode column
+.headers on
+
+-- Basic SELECT query
+SELECT * FROM customers LIMIT 5;
+
+-- Filtering data
+SELECT * FROM products WHERE category = 'Fuel';
+
+-- Sorting data
+SELECT * FROM drivers ORDER BY hire_date DESC;
+Practice Exercise 1: Write Your First Queries
+Try writing these queries yourself:
+
+Get all active drivers
+Find all products with a unit price greater than $3.50
+List customers located in Denver
+
+Module 1.3: Data Relationships and Joins
+Let's explore how to join tables together:
+sql-- Join customers and sales (if you have sales data)
+SELECT c.customer_name, s.sale_date, s.total_amount 
+FROM customers c
+JOIN sales s ON c.customer_id = s.customer_id
+LIMIT 10;
+
+-- Join products and sales
+SELECT p.product_name, s.quantity, s.total_amount 
+FROM products p
+JOIN sales s ON p.product_id = s.product_id
+LIMIT 10;
+Practice Exercise 2: Working with Multiple Tables
+Try these more complex queries:
+
+List all sales with customer name and product name
+Find the total sales amount for each product
+Identify which driver delivered to which customer
+
+Module 1.4: Adding Your Own Sales Data
+Let's manually add some sales records to connect our customers and products:
+sql-- Insert sales records
+INSERT INTO sales (customer_id, product_id, sale_date, quantity, total_amount)
+VALUES 
+(1, 3, '2024-05-15', 500, 1825.00),
+(2, 1, '2024-05-16', 350, 1207.50),
+(3, 3, '2024-05-17', 800, 2920.00),
+(4, 2, '2024-05-18', 200, 770.00),
+(5, 3, '2024-05-19', 600, 2190.00);
+
+-- Verify the inserted data
+SELECT * FROM sales;
+Step 4: Updating the Cost and Profit Columns
+Now let's use our new columns to calculate costs and profits:
+sql-- Update the cost column based on product unit cost and quantity
+UPDATE sales
+SET cost = (
+    SELECT p.unit_cost * sales.quantity
+    FROM products p
+    WHERE p.product_id = sales.product_id
+);
+
+-- Calculate and update the profit column
+UPDATE sales
+SET profit = total_amount - cost;
+
+-- View the results
+SELECT 
+    s.sale_id,
+    c.customer_name,
+    p.product_name,
+    s.quantity,
+    s.total_amount,
+    s.cost,
+    s.profit,
+    (s.profit / s.total_amount) * 100 AS profit_margin_percent
+FROM 
+    sales s
+JOIN customers c ON s.customer_id = c.customer_id
+JOIN products p ON s.product_id = p.product_id;
+Module 1.5: Creating Views for Common Queries
+Let's create a view to simplify complex queries:
+sql-- Create a sales report view
+CREATE VIEW sales_report AS
+SELECT 
+    s.sale_id,
+    s.sale_date,
+    c.customer_name,
+    p.product_name,
+    p.category,
+    s.quantity,
+    s.total_amount,
+    s.cost,
+    s.profit,
+    (s.profit / s.total_amount) * 100 AS profit_margin_percent
+FROM 
+    sales s
+JOIN customers c ON s.customer_id = c.customer_id
+JOIN products p ON s.product_id = p.product_id;
+
+-- Query the view
+SELECT * FROM sales_report;
+
+-- Find the most profitable products
+SELECT 
+    product_name,
+    SUM(quantity) AS total_quantity,
+    SUM(total_amount) AS total_sales,
+    SUM(profit) AS total_profit,
+    AVG(profit_margin_percent) AS avg_margin
+FROM 
+    sales_report
+GROUP BY 
+    product_name
+ORDER BY 
+    total_profit DESC;
+Module 1.6: Creating a Simple Delivery Tracking System
+Let's connect deliveries to our sales records:
+sql-- Insert some delivery records
+INSERT INTO deliveries (sale_id, driver_id, delivery_date, status, notes)
+VALUES
+(1, 1, '2024-05-16', 'Delivered', 'On-time delivery'),
+(2, 3, '2024-05-17', 'Delivered', 'Customer very satisfied'),
+(3, 2, '2024-05-18', 'Delivered', 'Slight delay due to traffic'),
+(4, 5, '2024-05-19', 'Delivered', 'No issues'),
+(5, 4, '2024-05-20', 'Delivered', 'Delivered ahead of schedule');
+
+-- Create a delivery tracking view
+CREATE VIEW delivery_tracking AS
+SELECT 
+    d.delivery_id,
+    d.delivery_date,
+    d.status,
+    c.customer_name,
+    c.city,
+    dr.driver_name,
+    p.product_name,
+    s.quantity,
+    d.notes
+FROM 
+    deliveries d
+JOIN sales s ON d.sale_id = s.sale_id
+JOIN customers c ON s.customer_id = c.customer_id
+JOIN products p ON s.product_id = p.product_id
+JOIN drivers dr ON d.driver_id = dr.driver_id;
+
+-- Query the delivery tracking view
+SELECT * FROM delivery_tracking;
+Practical Challenge: Business Intelligence Dashboard
+Let's combine what we've learned to build some business intelligence queries:
+sql-- Sales by city
+SELECT 
+    c.city,
+    COUNT(s.sale_id) AS sale_count,
+    SUM(s.total_amount) AS total_sales,
+    SUM(s.profit) AS total_profit
+FROM 
+    sales s
+JOIN customers c ON s.customer_id = c.customer_id
+GROUP BY 
+    c.city
+ORDER BY 
+    total_profit DESC;
+
+-- Performance by driver
+SELECT 
+    dr.driver_name,
+    COUNT(d.delivery_id) AS delivery_count,
+    SUM(s.total_amount) AS delivered_value,
+    SUM(s.profit) AS delivered_profit
+FROM 
+    deliveries d
+JOIN drivers dr ON d.driver_id = dr.driver_id
+JOIN sales s ON d.sale_id = s.sale_id
+GROUP BY 
+    dr.driver_name
+ORDER BY 
+    delivered_value DESC;
+
+-- Product performance by category
+SELECT 
+    p.category,
+    COUNT(s.sale_id) AS sale_count,
+    SUM(s.quantity) AS total_quantity,
+    SUM(s.total_amount) AS total_revenue,
+    SUM(s.profit) AS total_profit,
+    AVG(s.profit / s.total_amount) * 100 AS avg_profit_margin
+FROM 
+    sales s
+JOIN products p ON s.product_id = p.product_id
+GROUP BY 
+    p.category
+ORDER BY 
+    total_profit DESC;
+Update Your Progress Tracker
+After completing these steps, update your progress tracker:
+
+Open C:\Users\jacob\Desktop\DatabaseTraining\docs\progress.md
+Mark the completed tasks by changing [ ] to [x]

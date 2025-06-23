@@ -1,0 +1,499 @@
+<div class="module-section">
+    <div class="alert alert-info">
+        <h4>Delivery Tracking Project</h4>
+        <p>In this module, we'll complete a practical project: building a delivery tracking system for our petroleum sales company. This will tie together all the concepts we've learned so far.</p>
+    </div>
+
+    <h3>Project Overview</h3>
+    <p>Our petroleum sales company needs a better way to track deliveries and analyze delivery performance. We'll create a complete delivery tracking system using SQL.</p>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Project Requirements</h5>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li>Record deliveries for sales</li>
+                        <li>Track delivery status and details</li>
+                        <li>Monitor driver performance</li>
+                        <li>Generate delivery reports</li>
+                        <li>Analyze delivery metrics</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Project Deliverables</h5>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li>Set up delivery tracking tables</li>
+                        <li>Insert sample delivery data</li>
+                        <li>Create delivery views and reports</li>
+                        <li>Build a driver performance dashboard</li>
+                        <li>Implement delivery analytics</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Step 1: Review Existing Tables</h3>
+    <p>Let's start by reviewing our existing tables, particularly the <code>sales</code> and <code>drivers</code> tables that we'll connect with the <code>deliveries</code> table.</p>
+    
+    <div class="code-block">
+        <pre><code class="language-sql">-- Check the structure of the sales table
+PRAGMA table_info(sales);
+
+-- Check the structure of the drivers table
+PRAGMA table_info(drivers);
+
+-- Check the structure of the deliveries table
+PRAGMA table_info(deliveries);</code></pre>
+    </div>
+    
+    <p>The <code>deliveries</code> table is defined as follows:</p>
+    
+    <div class="db-table mb-4">
+        <div class="table-header">Deliveries Table</div>
+        <div class="table-body">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">delivery_id</td>
+                        <td>INTEGER</td>
+                        <td>Unique identifier for each delivery</td>
+                    </tr>
+                    <tr>
+                        <td class="foreign-key">sale_id</td>
+                        <td>INTEGER</td>
+                        <td>Reference to the sale being delivered</td>
+                    </tr>
+                    <tr>
+                        <td class="foreign-key">driver_id</td>
+                        <td>INTEGER</td>
+                        <td>Reference to the driver making the delivery</td>
+                    </tr>
+                    <tr>
+                        <td>delivery_date</td>
+                        <td>TEXT</td>
+                        <td>Date of delivery</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td>TEXT</td>
+                        <td>Delivery status (Scheduled, In Transit, Delivered, Failed)</td>
+                    </tr>
+                    <tr>
+                        <td>notes</td>
+                        <td>TEXT</td>
+                        <td>Additional notes about the delivery</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h3>Step 2: Insert Sample Delivery Data</h3>
+    <p>Now let's insert some sample delivery records into the <code>deliveries</code> table. We'll create deliveries for the existing sales in our database.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Insert Delivery Records</h5>
+        </div>
+        <div class="card-body">
+            <div class="code-block">
+                <pre><code class="language-sql">-- First, let's check our existing sales
+SELECT sale_id, customer_id, product_id, sale_date, quantity, total_amount
+FROM sales;
+
+-- Now, let's insert delivery records for these sales
+INSERT INTO deliveries (sale_id, driver_id, delivery_date, status, notes)
+VALUES
+(1, 1, '2024-05-16', 'Delivered', 'On-time delivery'),
+(2, 3, '2024-05-17', 'Delivered', 'Customer very satisfied'),
+(3, 2, '2024-05-18', 'Delivered', 'Slight delay due to traffic'),
+(4, 5, '2024-05-19', 'Delivered', 'No issues'),
+(5, 4, '2024-05-20', 'Delivered', 'Delivered ahead of schedule');
+
+-- Let's check if our deliveries were inserted correctly
+SELECT * FROM deliveries;</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <h3>Step 3: Create a Delivery Tracking View</h3>
+    <p>Now let's create a comprehensive view for tracking deliveries. This view will combine data from multiple tables to provide a complete picture of each delivery.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Create Delivery Tracking View</h5>
+        </div>
+        <div class="card-body">
+            <div class="code-block">
+                <pre><code class="language-sql">-- Create a comprehensive delivery tracking view
+CREATE VIEW delivery_tracking AS
+SELECT 
+  d.delivery_id,
+  d.delivery_date,
+  d.status AS delivery_status,
+  c.customer_id,
+  c.customer_name,
+  c.city,
+  c.state,
+  c.phone,
+  p.product_id,
+  p.product_name,
+  p.category,
+  s.quantity,
+  s.total_amount,
+  s.sale_date,
+  dr.driver_id,
+  dr.driver_name,
+  JULIANDAY(d.delivery_date) - JULIANDAY(s.sale_date) AS days_to_deliver,
+  d.notes
+FROM 
+  deliveries d
+JOIN 
+  sales s ON d.sale_id = s.sale_id
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+JOIN 
+  drivers dr ON d.driver_id = dr.driver_id;
+
+-- Query the view to see all delivery information
+SELECT * FROM delivery_tracking;</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <h3>Step 4: Create Driver Performance Dashboard</h3>
+    <p>Now let's create a view to track driver performance metrics.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Create Driver Performance View</h5>
+        </div>
+        <div class="card-body">
+            <div class="code-block">
+                <pre><code class="language-sql">-- Create a driver performance dashboard view
+CREATE VIEW driver_performance AS
+SELECT 
+  dr.driver_id,
+  dr.driver_name,
+  dr.license_number,
+  dr.status,
+  COUNT(d.delivery_id) AS delivery_count,
+  SUM(s.quantity) AS total_quantity_delivered,
+  ROUND(SUM(s.total_amount), 2) AS total_value_delivered,
+  ROUND(SUM(s.profit), 2) AS total_profit_delivered,
+  ROUND(AVG(JULIANDAY(d.delivery_date) - JULIANDAY(s.sale_date)), 1) AS avg_delivery_days,
+  (SELECT COUNT(*) 
+   FROM deliveries d2 
+   WHERE d2.driver_id = dr.driver_id AND d2.status = 'Delivered') AS successful_deliveries,
+  CASE 
+    WHEN COUNT(d.delivery_id) > 0 THEN 
+      ROUND((SELECT COUNT(*) 
+       FROM deliveries d2 
+       WHERE d2.driver_id = dr.driver_id AND d2.status = 'Delivered') * 100.0 / COUNT(d.delivery_id), 2)
+    ELSE 0 
+  END AS success_rate
+FROM 
+  drivers dr
+LEFT JOIN 
+  deliveries d ON dr.driver_id = d.driver_id
+LEFT JOIN 
+  sales s ON d.sale_id = s.sale_id
+GROUP BY 
+  dr.driver_id
+ORDER BY 
+  delivery_count DESC;
+
+-- Query the view to see driver performance metrics
+SELECT * FROM driver_performance;</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <h3>Step 5: Delivery Analytics</h3>
+    <p>Let's create some analytical queries to gain insights from our delivery data.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Delivery Time Analysis</h5>
+        </div>
+        <div class="card-body">
+            <p>This query analyzes the average delivery time by product category:</p>
+            <div class="code-block">
+                <pre><code class="language-sql">SELECT 
+  p.category,
+  COUNT(d.delivery_id) AS delivery_count,
+  ROUND(AVG(JULIANDAY(d.delivery_date) - JULIANDAY(s.sale_date)), 1) AS avg_delivery_days,
+  MIN(JULIANDAY(d.delivery_date) - JULIANDAY(s.sale_date)) AS min_delivery_days,
+  MAX(JULIANDAY(d.delivery_date) - JULIANDAY(s.sale_date)) AS max_delivery_days
+FROM 
+  deliveries d
+JOIN 
+  sales s ON d.sale_id = s.sale_id
+JOIN 
+  products p ON s.product_id = p.product_id
+GROUP BY 
+  p.category
+ORDER BY 
+  avg_delivery_days;</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Delivery Status Distribution</h5>
+        </div>
+        <div class="card-body">
+            <p>This query analyzes the distribution of delivery statuses:</p>
+            <div class="code-block">
+                <pre><code class="language-sql">SELECT 
+  status,
+  COUNT(*) AS count,
+  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM deliveries), 2) AS percentage
+FROM 
+  deliveries
+GROUP BY 
+  status
+ORDER BY 
+  count DESC;</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Customer Delivery Analysis</h5>
+        </div>
+        <div class="card-body">
+            <p>This query analyzes delivery performance by customer:</p>
+            <div class="code-block">
+                <pre><code class="language-sql">SELECT 
+  c.customer_name,
+  c.city,
+  COUNT(d.delivery_id) AS delivery_count,
+  ROUND(AVG(JULIANDAY(d.delivery_date) - JULIANDAY(s.sale_date)), 1) AS avg_delivery_days,
+  SUM(s.quantity) AS total_quantity,
+  ROUND(SUM(s.total_amount), 2) AS total_value
+FROM 
+  customers c
+JOIN 
+  sales s ON c.customer_id = s.customer_id
+JOIN 
+  deliveries d ON s.sale_id = d.sale_id
+GROUP BY 
+  c.customer_id
+ORDER BY 
+  total_value DESC;</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <h3>Step 6: Create a Comprehensive Delivery Report</h3>
+    <p>Finally, let's create a query for a comprehensive delivery report that can be used by management.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Comprehensive Delivery Report</h5>
+        </div>
+        <div class="card-body">
+            <div class="code-block">
+                <pre><code class="language-sql">-- Delivery Summary
+SELECT 
+  'Total Deliveries' AS metric,
+  COUNT(*) AS value
+FROM 
+  deliveries
+UNION ALL
+SELECT 
+  'Average Delivery Time (days)',
+  ROUND(AVG(JULIANDAY(d.delivery_date) - JULIANDAY(s.sale_date)), 1)
+FROM 
+  deliveries d
+JOIN 
+  sales s ON d.sale_id = s.sale_id
+UNION ALL
+SELECT 
+  'Total Delivery Value',
+  ROUND(SUM(s.total_amount), 2)
+FROM 
+  deliveries d
+JOIN 
+  sales s ON d.sale_id = s.sale_id
+UNION ALL
+SELECT 
+  'Total Quantity Delivered',
+  SUM(s.quantity)
+FROM 
+  deliveries d
+JOIN 
+  sales s ON d.sale_id = s.sale_id
+UNION ALL
+SELECT 
+  'Successful Delivery Rate',
+  ROUND((SELECT COUNT(*) FROM deliveries WHERE status = 'Delivered') * 100.0 / COUNT(*), 2) || '%'
+FROM 
+  deliveries;
+
+-- Top Drivers
+SELECT 
+  'Top Drivers by Delivery Count' AS report_section;
+
+SELECT 
+  driver_name,
+  delivery_count,
+  ROUND(success_rate, 2) || '%' AS success_rate,
+  ROUND(avg_delivery_days, 1) AS avg_delivery_days
+FROM 
+  driver_performance
+ORDER BY 
+  delivery_count DESC
+LIMIT 3;
+
+-- Delivery Performance by Product Category
+SELECT 
+  'Delivery Performance by Product Category' AS report_section;
+
+SELECT 
+  p.category,
+  COUNT(d.delivery_id) AS delivery_count,
+  ROUND(AVG(JULIANDAY(d.delivery_date) - JULIANDAY(s.sale_date)), 1) AS avg_delivery_days,
+  ROUND(SUM(s.total_amount), 2) AS total_value,
+  ROUND(SUM(s.profit), 2) AS total_profit
+FROM 
+  deliveries d
+JOIN 
+  sales s ON d.sale_id = s.sale_id
+JOIN 
+  products p ON s.product_id = p.product_id
+GROUP BY 
+  p.category
+ORDER BY 
+  delivery_count DESC;
+
+-- Recent Deliveries
+SELECT 
+  'Recent Deliveries' AS report_section;
+
+SELECT 
+  d.delivery_date,
+  c.customer_name,
+  c.city,
+  p.product_name,
+  s.quantity,
+  s.total_amount,
+  dr.driver_name,
+  d.status,
+  JULIANDAY(d.delivery_date) - JULIANDAY(s.sale_date) AS days_to_deliver
+FROM 
+  deliveries d
+JOIN 
+  sales s ON d.sale_id = s.sale_id
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+JOIN 
+  drivers dr ON d.driver_id = dr.driver_id
+ORDER BY 
+  d.delivery_date DESC
+LIMIT 5;</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <h3>Step 7: Implement a Delivery Status Update Procedure</h3>
+    <p>Let's create a query that simulates a procedure to update the status of deliveries.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Update Delivery Status</h5>
+        </div>
+        <div class="card-body">
+            <div class="code-block">
+                <pre><code class="language-sql">-- Let's create a few pending deliveries first
+INSERT INTO deliveries (sale_id, driver_id, delivery_date, status, notes)
+VALUES
+(1, 6, '2024-06-25', 'Scheduled', 'Pending delivery'),
+(2, 7, '2024-06-26', 'In Transit', 'On the way to customer');
+
+-- Now let's update a delivery status
+UPDATE deliveries
+SET 
+  status = 'Delivered',
+  notes = notes || '; Delivered successfully',
+  delivery_date = '2024-06-23'
+WHERE 
+  delivery_id = 6;
+
+-- Check the updated delivery
+SELECT * FROM deliveries WHERE delivery_id = 6;</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <h3>Project Results</h3>
+    <p>Congratulations! You've successfully built a complete delivery tracking system for the petroleum sales company. This system allows the company to:</p>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+        <div class="col">
+            <div class="card h-100 border-success">
+                <div class="card-body">
+                    <h5 class="card-title">Track Deliveries</h5>
+                    <p class="card-text">Monitor the status and details of all product deliveries to customers.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 border-success">
+                <div class="card-body">
+                    <h5 class="card-title">Evaluate Drivers</h5>
+                    <p class="card-text">Assess the performance of delivery drivers based on delivery metrics.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 border-success">
+                <div class="card-body">
+                    <h5 class="card-title">Analyze Performance</h5>
+                    <p class="card-text">Gain insights from delivery data to improve operational efficiency.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="alert alert-success">
+        <h5>Real-World Applications</h5>
+        <p>The concepts and techniques you've learned in this project can be applied to many real-world scenarios:</p>
+        <ul>
+            <li>Logistics and supply chain management</li>
+            <li>E-commerce order tracking</li>
+            <li>Service delivery monitoring</li>
+            <li>Field operations management</li>
+            <li>Fleet management systems</li>
+        </ul>
+        <p>By understanding how to create relationships between tables, build views, and write analytical queries, you've gained valuable skills for working with relational databases in a business context.</p>
+    </div>
+
+    <div class="text-center mt-5">
+        <button id="complete-module-btn" class="btn btn-primary btn-lg px-4">Mark as Complete</button>
+    </div>
+</div>

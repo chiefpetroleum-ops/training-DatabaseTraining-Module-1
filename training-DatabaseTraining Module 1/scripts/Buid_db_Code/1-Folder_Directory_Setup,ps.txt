@@ -1,0 +1,23 @@
+# Check if running as administrator
+$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+Write-Host "Running as administrator: $isAdmin"
+
+# Define project root explicitly
+$projectRoot = "C:\Users\jacob\Desktop\DatabaseTraining"
+Write-Host "Project root set to: $projectRoot"
+
+# Create project directory on desktop
+New-Item -ItemType Directory -Path $projectRoot -Force
+
+# Create subdirectories
+$directories = @(
+    "$projectRoot\data",
+    "$projectRoot\scripts",
+    "$projectRoot\docs",
+    "$projectRoot\json_data"
+)
+foreach ($dir in $directories) {
+    New-Item -ItemType Directory -Path $dir -Force
+}
+
+Write-Host "Project structure created at $projectRoot"

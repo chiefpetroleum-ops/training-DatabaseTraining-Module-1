@@ -1,0 +1,71 @@
+# Create a markdown file to track progress
+$progressMarkdown = @"
+# Database Training Progress Tracker
+
+## Module 1: SQLite Database Setup
+
+### Setup Tasks
+- [x] Verify admin rights
+- [x] Create project structure
+- [x] Install SQLite
+- [x] Install Python packages
+
+### Data Preparation
+- [ ] Clean and analyze CSV data
+- [ ] Import CSV data to SQLite
+
+### Database Creation
+- [x] Create database schema
+- [x] Create tables
+- [ ] Import JSON data to tables
+- [ ] Add custom columns
+
+### SQL Practice
+- [ ] Write basic SELECT queries
+- [ ] Filter data with WHERE clauses
+- [ ] Join tables
+- [ ] Create views
+- [ ] Write aggregate queries
+
+## Module 2: Microsoft Access Setup (Upcoming)
+
+### Setup Tasks
+- [ ] Install/verify Microsoft Access
+- [ ] Create a new Access database
+- [ ] Import data from CSV
+- [ ] Create tables and relationships
+
+### Access Features
+- [ ] Create forms
+- [ ] Create reports
+- [ ] Write Access queries
+- [ ] Create macros
+"@
+
+$progressMarkdown | Out-File -FilePath "$projectRoot\docs\progress.md" -Encoding utf8
+
+Write-Host "Progress tracking markdown created"
+
+# Create a placeholder for Module 2
+$module2Placeholder = @"
+# Module 2: Microsoft Access Database Setup
+
+This module will cover setting up the same database structure in Microsoft Access.
+
+## Topics to Cover:
+1. Creating a new Access database
+2. Importing data from CSV and JSON
+3. Creating tables and defining relationships
+4. Creating forms for data entry
+5. Creating reports for data visualization
+6. Writing Access queries
+7. Creating macros for automation
+
+## Prerequisites:
+- Microsoft Access installed (part of Microsoft Office)
+- Completed Module 1
+"@
+
+$module2Placeholder | Out-File -FilePath "$projectRoot\docs\module2_plan.md" -Encoding utf8
+
+Write-Host "Module 2 placeholder created"

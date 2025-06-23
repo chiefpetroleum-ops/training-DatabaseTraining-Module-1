@@ -1,0 +1,57 @@
+﻿[
+  {
+    "customer_id": 1,
+    "customer_name": "Acme Trucking",
+    "contact_person": "John Doe",
+    "email": "john.doe@acmetrucking.com",
+    "phone": "555-123-4567",
+    "address": "123 Main St",
+    "city": "Denver",
+    "state": "CO",
+    "zip_code": "80014"
+  },
+  {
+    "customer_id": 2,
+    "customer_name": "Mountain Delivery Services",
+    "contact_person": "Jane Smith",
+    "email": "jane.smith@mountaindelivery.com",
+    "phone": "555-987-6543",
+    "address": "456 Pine Ave",
+    "city": "Boulder",
+    "state": "CO",
+    "zip_code": "80302"
+  },
+  {
+    "customer_id": 3,
+    "customer_name": "Western Freight LLC",
+    "contact_person": "Bob Johnson",
+    "email": "bob@westernfreight.com",
+    "phone": "555-456-7890",
+    "address": "789 Oak Blvd",
+    "city": "Fort Collins",
+    "state": "CO",
+    "zip_code": "80525"
+  },
+  {
+    "customer_id": 4,
+    "customer_name": "Rocky Mountain Transport",
+    "contact_person": "Sarah Williams",
+    "email": "sarah@rmtransport.com",
+    "phone": "555-789-0123",
+    "address": "101 River Rd",
+    "city": "Pueblo",
+    "state": "CO",
+    "zip_code": "81001"
+  },
+  {
+    "customer_id": 5,
+    "customer_name": "Colorado Express",
+    "contact_person": "Mike Brown",
+    "email": "mike@coloradoexpress.com",
+    "phone": "555-321-6547",
+    "address": "202 Mountain View Dr",
+    "city": "Colorado Springs",
+    "state": "CO",
+    "zip_code": "80903"
+  }
+]

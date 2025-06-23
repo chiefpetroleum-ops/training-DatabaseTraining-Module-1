@@ -1,0 +1,614 @@
+<div class="module-section">
+    <div class="alert alert-info">
+        <h4>SQL Practice Exercises</h4>
+        <p>In this module, you'll apply what you've learned with hands-on SQL exercises. Try to solve each exercise on your own before revealing the solution.</p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">How to Use This Module</h5>
+        </div>
+        <div class="card-body">
+            <ol>
+                <li>Read each exercise carefully</li>
+                <li>Write your SQL query in the SQL Playground</li>
+                <li>Run your query and check the results</li>
+                <li>Compare your solution with the provided solution</li>
+                <li>If you get stuck, use the hints before looking at the solution</li>
+            </ol>
+            <p>Remember, there's often more than one way to write a SQL query that produces the same result. Your solution might look different from the provided solution but still be correct.</p>
+        </div>
+    </div>
+
+    <h3>Basic Queries</h3>
+    <p>Let's start with some basic SELECT queries.</p>
+    
+    <div class="accordion mb-4" id="basicExercises">
+        <div class="accordion-item exercise-card">
+            <h2 class="accordion-header" id="headingBasic1">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBasic1" aria-expanded="true" aria-controls="collapseBasic1">
+                    Exercise 1: List all customers in Colorado Springs
+                </button>
+            </h2>
+            <div id="collapseBasic1" class="accordion-collapse collapse show" aria-labelledby="headingBasic1" data-bs-parent="#basicExercises">
+                <div class="accordion-body">
+                    <p><strong>Task:</strong> Write a query to list all customers located in Colorado Springs. Show their customer name, contact person, phone, and address.</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            Hint
+                        </div>
+                        <div class="card-body">
+                            <p>Use the <code>WHERE</code> clause to filter customers by city.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            Solution
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">SELECT customer_name, contact_person, phone, address
+FROM customers
+WHERE city = 'Colorado Springs';</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item exercise-card">
+            <h2 class="accordion-header" id="headingBasic2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBasic2" aria-expanded="false" aria-controls="collapseBasic2">
+                    Exercise 2: Find all products with a unit price greater than $3.50
+                </button>
+            </h2>
+            <div id="collapseBasic2" class="accordion-collapse collapse" aria-labelledby="headingBasic2" data-bs-parent="#basicExercises">
+                <div class="accordion-body">
+                    <p><strong>Task:</strong> Write a query to find all products with a unit price greater than $3.50. Show the product name, category, unit price, and unit cost.</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            Hint
+                        </div>
+                        <div class="card-body">
+                            <p>Use the <code>WHERE</code> clause with the <code>&gt;</code> operator to filter products by price.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            Solution
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">SELECT product_name, category, unit_price, unit_cost
+FROM products
+WHERE unit_price > 3.50;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item exercise-card">
+            <h2 class="accordion-header" id="headingBasic3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBasic3" aria-expanded="false" aria-controls="collapseBasic3">
+                    Exercise 3: List all active drivers hired after 2019
+                </button>
+            </h2>
+            <div id="collapseBasic3" class="accordion-collapse collapse" aria-labelledby="headingBasic3" data-bs-parent="#basicExercises">
+                <div class="accordion-body">
+                    <p><strong>Task:</strong> Write a query to list all active drivers who were hired after 2019. Show their name, license number, hire date, and status.</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            Hint
+                        </div>
+                        <div class="card-body">
+                            <p>Use the <code>WHERE</code> clause with multiple conditions connected by <code>AND</code>. For dates, you can use string comparison.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            Solution
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">SELECT driver_name, license_number, hire_date, status
+FROM drivers
+WHERE status = 'Active'
+AND hire_date >= '2020-01-01';</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Intermediate Queries</h3>
+    <p>Now let's try some more complex queries with calculations, grouping, and sorting.</p>
+    
+    <div class="accordion mb-4" id="intermediateExercises">
+        <div class="accordion-item exercise-card">
+            <h2 class="accordion-header" id="headingIntermediate1">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIntermediate1" aria-expanded="false" aria-controls="collapseIntermediate1">
+                    Exercise 4: Calculate profit margins for all products
+                </button>
+            </h2>
+            <div id="collapseIntermediate1" class="accordion-collapse collapse" aria-labelledby="headingIntermediate1" data-bs-parent="#intermediateExercises">
+                <div class="accordion-body">
+                    <p><strong>Task:</strong> Write a query to calculate the profit margin for each product. Show the product name, unit price, unit cost, profit per unit, and profit margin as a percentage. Sort by profit margin (highest first).</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            Hint
+                        </div>
+                        <div class="card-body">
+                            <p>Profit margin percentage can be calculated as: (unit_price - unit_cost) / unit_price * 100. Use the <code>ROUND()</code> function to limit decimal places.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            Solution
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">SELECT 
+  product_name,
+  unit_price,
+  unit_cost,
+  (unit_price - unit_cost) AS profit_per_unit,
+  ROUND(((unit_price - unit_cost) / unit_price * 100), 2) AS profit_margin_percent
+FROM 
+  products
+ORDER BY 
+  profit_margin_percent DESC;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item exercise-card">
+            <h2 class="accordion-header" id="headingIntermediate2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIntermediate2" aria-expanded="false" aria-controls="collapseIntermediate2">
+                    Exercise 5: Find the average sale amount by product category
+                </button>
+            </h2>
+            <div id="collapseIntermediate2" class="accordion-collapse collapse" aria-labelledby="headingIntermediate2" data-bs-parent="#intermediateExercises">
+                <div class="accordion-body">
+                    <p><strong>Task:</strong> Write a query to find the average sale amount for each product category. Show the category, number of sales, total quantity sold, total amount, and average sale amount. Sort by average sale amount (highest first).</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            Hint
+                        </div>
+                        <div class="card-body">
+                            <p>You'll need to join the <code>sales</code> and <code>products</code> tables, then group by <code>category</code>. Use aggregate functions like <code>COUNT()</code>, <code>SUM()</code>, and <code>AVG()</code>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            Solution
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">SELECT 
+  p.category,
+  COUNT(s.sale_id) AS number_of_sales,
+  SUM(s.quantity) AS total_quantity,
+  ROUND(SUM(s.total_amount), 2) AS total_amount,
+  ROUND(AVG(s.total_amount), 2) AS average_sale_amount
+FROM 
+  sales s
+JOIN 
+  products p ON s.product_id = p.product_id
+GROUP BY 
+  p.category
+ORDER BY 
+  average_sale_amount DESC;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item exercise-card">
+            <h2 class="accordion-header" id="headingIntermediate3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIntermediate3" aria-expanded="false" aria-controls="collapseIntermediate3">
+                    Exercise 6: Find customers who haven't made any purchases
+                </button>
+            </h2>
+            <div id="collapseIntermediate3" class="accordion-collapse collapse" aria-labelledby="headingIntermediate3" data-bs-parent="#intermediateExercises">
+                <div class="accordion-body">
+                    <p><strong>Task:</strong> Write a query to find all customers who haven't made any purchases. Show their customer name, contact person, and phone number.</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            Hint
+                        </div>
+                        <div class="card-body">
+                            <p>Use a <code>LEFT JOIN</code> between <code>customers</code> and <code>sales</code>, then filter for customers where <code>sale_id</code> is NULL.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            Solution
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">SELECT 
+  c.customer_name,
+  c.contact_person,
+  c.phone
+FROM 
+  customers c
+LEFT JOIN 
+  sales s ON c.customer_id = s.customer_id
+WHERE 
+  s.sale_id IS NULL;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Advanced Queries</h3>
+    <p>Finally, let's tackle some more complex queries involving multiple joins, subqueries, and business analytics.</p>
+    
+    <div class="accordion mb-4" id="advancedExercises">
+        <div class="accordion-item exercise-card">
+            <h2 class="accordion-header" id="headingAdvanced1">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdvanced1" aria-expanded="false" aria-controls="collapseAdvanced1">
+                    Exercise 7: Complete sales report with customer and product details
+                </button>
+            </h2>
+            <div id="collapseAdvanced1" class="accordion-collapse collapse" aria-labelledby="headingAdvanced1" data-bs-parent="#advancedExercises">
+                <div class="accordion-body">
+                    <p><strong>Task:</strong> Create a comprehensive sales report that includes customer and product details. Show the sale date, customer name, city, product name, category, quantity, total amount, and profit. Sort by sale date (newest first).</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            Hint
+                        </div>
+                        <div class="card-body">
+                            <p>You'll need to join three tables: <code>sales</code>, <code>customers</code>, and <code>products</code>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            Solution
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">SELECT 
+  s.sale_date,
+  c.customer_name,
+  c.city,
+  p.product_name,
+  p.category,
+  s.quantity,
+  s.total_amount,
+  s.profit
+FROM 
+  sales s
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+ORDER BY 
+  s.sale_date DESC;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item exercise-card">
+            <h2 class="accordion-header" id="headingAdvanced2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdvanced2" aria-expanded="false" aria-controls="collapseAdvanced2">
+                    Exercise 8: Find the top 3 most profitable customers
+                </button>
+            </h2>
+            <div id="collapseAdvanced2" class="accordion-collapse collapse" aria-labelledby="headingAdvanced2" data-bs-parent="#advancedExercises">
+                <div class="accordion-body">
+                    <p><strong>Task:</strong> Write a query to find the top 3 most profitable customers. Show the customer name, total sales, total quantity, total revenue, total profit, and average profit margin.</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            Hint
+                        </div>
+                        <div class="card-body">
+                            <p>Join <code>customers</code> and <code>sales</code>, group by customer, calculate aggregates, and use <code>LIMIT</code> to get only the top 3.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            Solution
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">SELECT 
+  c.customer_name,
+  COUNT(s.sale_id) AS total_sales,
+  SUM(s.quantity) AS total_quantity,
+  ROUND(SUM(s.total_amount), 2) AS total_revenue,
+  ROUND(SUM(s.profit), 2) AS total_profit,
+  ROUND(AVG(s.profit / s.total_amount) * 100, 2) AS avg_profit_margin
+FROM 
+  customers c
+JOIN 
+  sales s ON c.customer_id = s.customer_id
+GROUP BY 
+  c.customer_id
+ORDER BY 
+  total_profit DESC
+LIMIT 3;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item exercise-card">
+            <h2 class="accordion-header" id="headingAdvanced3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdvanced3" aria-expanded="false" aria-controls="collapseAdvanced3">
+                    Exercise 9: Create a delivery tracking view
+                </button>
+            </h2>
+            <div id="collapseAdvanced3" class="accordion-collapse collapse" aria-labelledby="headingAdvanced3" data-bs-parent="#advancedExercises">
+                <div class="accordion-body">
+                    <p><strong>Task:</strong> Create a view named <code>delivery_tracking</code> that includes information about deliveries, including customer, product, driver, and status details.</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            Hint
+                        </div>
+                        <div class="card-body">
+                            <p>You'll need to join four tables: <code>deliveries</code>, <code>sales</code>, <code>customers</code>, and <code>drivers</code>. Use <code>CREATE VIEW</code> to save the query as a view.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            Solution
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">CREATE VIEW delivery_tracking AS
+SELECT 
+  d.delivery_id,
+  d.delivery_date,
+  d.status AS delivery_status,
+  c.customer_name,
+  c.city,
+  c.phone,
+  dr.driver_name,
+  p.product_name,
+  s.quantity,
+  s.total_amount,
+  d.notes
+FROM 
+  deliveries d
+JOIN 
+  sales s ON d.sale_id = s.sale_id
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+JOIN 
+  drivers dr ON d.driver_id = dr.driver_id;
+
+-- Now query the view
+SELECT * FROM delivery_tracking;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item exercise-card">
+            <h2 class="accordion-header" id="headingAdvanced4">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdvanced4" aria-expanded="false" aria-controls="collapseAdvanced4">
+                    Exercise 10: Find sales with above-average quantities
+                </button>
+            </h2>
+            <div id="collapseAdvanced4" class="accordion-collapse collapse" aria-labelledby="headingAdvanced4" data-bs-parent="#advancedExercises">
+                <div class="accordion-body">
+                    <p><strong>Task:</strong> Write a query to find all sales with above-average quantities for their product category. Show the sale date, customer name, product name, category, quantity, and the average quantity for that category.</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            Hint
+                        </div>
+                        <div class="card-body">
+                            <p>You'll need to use a subquery to calculate the average quantity for each category, then compare each sale's quantity to its category average.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            Solution
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">SELECT 
+  s.sale_date,
+  c.customer_name,
+  p.product_name,
+  p.category,
+  s.quantity,
+  (SELECT AVG(s2.quantity)
+   FROM sales s2
+   JOIN products p2 ON s2.product_id = p2.product_id
+   WHERE p2.category = p.category) AS category_avg_quantity
+FROM 
+  sales s
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+WHERE 
+  s.quantity > (
+    SELECT AVG(s2.quantity)
+    FROM sales s2
+    JOIN products p2 ON s2.product_id = p2.product_id
+    WHERE p2.category = p.category
+  )
+ORDER BY 
+  p.category, s.quantity DESC;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Challenge Exercise</h3>
+    <p>Ready for a challenge? Try this comprehensive business intelligence query.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Exercise 11: Comprehensive Business Intelligence Dashboard</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Task:</strong> Create a complete business intelligence dashboard that includes:</p>
+            <ol>
+                <li>Top 3 customers by revenue</li>
+                <li>Top 3 products by profit</li>
+                <li>Top 3 cities by sales</li>
+                <li>Most recent 3 deliveries</li>
+                <li>Overall sales, revenue, and profit metrics</li>
+            </ol>
+            <p>Use multiple queries and combine them into a comprehensive report.</p>
+            
+            <div class="accordion" id="challengeAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingChallenge">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChallenge" aria-expanded="false" aria-controls="collapseChallenge">
+                            Solution
+                        </button>
+                    </h2>
+                    <div id="collapseChallenge" class="accordion-collapse collapse" aria-labelledby="headingChallenge" data-bs-parent="#challengeAccordion">
+                        <div class="accordion-body">
+                            <div class="code-block">
+                                <pre><code class="language-sql">-- Top 3 customers by revenue
+SELECT 
+  c.customer_name,
+  COUNT(s.sale_id) AS order_count,
+  ROUND(SUM(s.total_amount), 2) AS total_revenue,
+  ROUND(SUM(s.profit), 2) AS total_profit
+FROM 
+  customers c
+JOIN 
+  sales s ON c.customer_id = s.customer_id
+GROUP BY 
+  c.customer_id
+ORDER BY 
+  total_revenue DESC
+LIMIT 3;
+
+-- Top 3 products by profit
+SELECT 
+  p.product_name,
+  p.category,
+  COUNT(s.sale_id) AS times_sold,
+  SUM(s.quantity) AS total_quantity,
+  ROUND(SUM(s.profit), 2) AS total_profit,
+  ROUND(AVG(s.profit / s.total_amount) * 100, 2) AS avg_profit_margin
+FROM 
+  products p
+JOIN 
+  sales s ON p.product_id = s.product_id
+GROUP BY 
+  p.product_id
+ORDER BY 
+  total_profit DESC
+LIMIT 3;
+
+-- Top 3 cities by sales
+SELECT 
+  c.city,
+  c.state,
+  COUNT(s.sale_id) AS order_count,
+  ROUND(SUM(s.total_amount), 2) AS total_revenue
+FROM 
+  customers c
+JOIN 
+  sales s ON c.customer_id = s.customer_id
+GROUP BY 
+  c.city, c.state
+ORDER BY 
+  total_revenue DESC
+LIMIT 3;
+
+-- Most recent 3 deliveries
+SELECT 
+  d.delivery_date,
+  c.customer_name,
+  p.product_name,
+  s.quantity,
+  dr.driver_name,
+  d.status
+FROM 
+  deliveries d
+JOIN 
+  sales s ON d.sale_id = s.sale_id
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+JOIN 
+  drivers dr ON d.driver_id = dr.driver_id
+ORDER BY 
+  d.delivery_date DESC
+LIMIT 3;
+
+-- Overall metrics
+SELECT 
+  COUNT(DISTINCT c.customer_id) AS total_customers,
+  COUNT(DISTINCT p.product_id) AS total_products,
+  COUNT(s.sale_id) AS total_sales,
+  COUNT(d.delivery_id) AS total_deliveries,
+  ROUND(SUM(s.total_amount), 2) AS total_revenue,
+  ROUND(SUM(s.profit), 2) AS total_profit,
+  ROUND(AVG(s.profit / s.total_amount) * 100, 2) AS avg_profit_margin
+FROM 
+  sales s
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+LEFT JOIN 
+  deliveries d ON s.sale_id = d.sale_id;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <button id="complete-module-btn" class="btn btn-primary btn-lg px-4">Mark as Complete</button>
+    </div>
+</div>

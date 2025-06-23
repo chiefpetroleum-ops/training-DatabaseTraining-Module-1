@@ -1,0 +1,45 @@
+# Create the database and execute the setup script
+$sqliteExe = Get-ChildItem -Path "$projectRoot\sqlite" -Filter "sqlite3.exe" -Recurse | Select-Object -First 1 -ExpandProperty FullName
+$dbPath = "$projectRoot\data\petroleum_sales.db"
+
+# Create an empty file first
+New-Item -ItemType File -Path $dbPath -Force
+
+# Execute the SQL script
+if ($sqliteExe) {
+    cmd /c "$sqliteExe $dbPath < $projectRoot\scripts\create_database.sql"
+    Write-Host "Database created successfully at $dbPath"
+} else {
+    Write-Host "SQLite executable not found. Database creation skipped."
+}
+
+# Try to copy or create the CSV file
+try {
+    $csvPath = "Copy of Final Sales Report 2425 Data 1.csv"
+    # Check if the file exists in the current directory
+    if (Test-Path $csvPath) {
+        Copy-Item -Path $csvPath -Destination "$projectRoot\data\sales_data.csv" -Force
+        Write-Host "Sales data copied to project folder"
+    } else {
+        # Create a placeholder file if the original CSV is not found
+        @"
+Date,Customer,Product,Quantity,Price,Total
+2024-01-15,Acme Trucking,Diesel Fuel,500,3.65,1825.00
+2024-01-16,Mountain Delivery Services,Regular Unleaded Gasoline,350,3.45,1207.50
+2024-01-17,Western Freight LLC,Diesel Fuel,800,3.65,2920.00
+2024-01-18,Rocky Mountain Transport,Premium Unleaded Gasoline,200,3.85,770.00
+2024-01-19,Colorado Express,Diesel Fuel,600,3.65,2190.00
+"@ | Out-File -FilePath "$projectRoot\data\sales_data.csv" -Encoding utf8
+        Write-Host "Created sample sales data file"
+    }
+} catch {
+    Write-Host "Error copying or creating sales data: $_"
+}
+
+Write-Host "`nSetup completed successfully! Your database training environment is ready.`n"
+Write-Host "To get started:"
+Write-Host "1. Navigate to: $projectRoot"
+Write-Host "2. Run the data cleaning script: python $projectRoot\scripts\clean_data.py"
+Write-Host "3. Import the JSON data: python $projectRoot\scripts\import_json_data.py"
+Write-Host "4. Add columns to tables: python $projectRoot\scripts\add_column.py"
+Write-Host "5. Track your progress in: $projectRoot\docs\progress.md"

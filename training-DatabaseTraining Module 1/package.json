@@ -1,0 +1,20 @@
+{
+  "name": "database-training",
+  "version": "1.0.0",
+  "description": "Interactive browser-based SQLite database training",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "database",
+    "training",
+    "sqlite",
+    "sql",
+    "education"
+  ],
+  "author": "True North Data Strategies",
+  "license": "MIT"
+}

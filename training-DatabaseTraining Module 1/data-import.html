@@ -1,0 +1,372 @@
+<div class="module-section">
+    <div class="alert alert-info">
+        <h4>Data Import & Cleaning</h4>
+        <p>In this module, we'll explore how data is imported into a database and the importance of data cleaning.</p>
+    </div>
+
+    <h3>The Data Import Process</h3>
+    <p>Importing data into a database involves several steps to ensure the data is correctly formatted, validated, and inserted into the appropriate tables.</p>
+    
+    <div class="step-guide mb-4">
+        <div class="step">
+            <h5>Data Collection</h5>
+            <p>Gather data from various sources such as CSV files, JSON files, Excel spreadsheets, web services, or manual entry.</p>
+        </div>
+        <div class="step">
+            <h5>Data Cleaning</h5>
+            <p>Identify and correct errors, handle missing values, standardize formats, and ensure consistency across the dataset.</p>
+        </div>
+        <div class="step">
+            <h5>Data Transformation</h5>
+            <p>Convert data into the appropriate format for your database schema, including data type conversions and structural changes.</p>
+        </div>
+        <div class="step">
+            <h5>Data Validation</h5>
+            <p>Check that the data meets your requirements and constraints, such as unique IDs, valid relationships, and business rules.</p>
+        </div>
+        <div class="step">
+            <h5>Data Loading</h5>
+            <p>Insert the prepared data into the database tables, handling any errors or conflicts that may arise.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <h3>Common Data Sources</h3>
+            <p>Data can come from various sources, each with its own format and challenges:</p>
+            
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">CSV Files</h5>
+                </div>
+                <div class="card-body">
+                    <p>Comma-Separated Values files are simple text files where each line represents a row and values are separated by commas.</p>
+                    <strong>Example:</strong>
+                    <pre><code class="language-csv">customer_id,customer_name,city,state
+1,Acme Trucking,Denver,CO
+2,Mountain Delivery,Boulder,CO</code></pre>
+                    <strong>Challenges:</strong>
+                    <ul>
+                        <li>Handling commas within text fields</li>
+                        <li>Inconsistent formatting</li>
+                        <li>Missing or extra columns</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">JSON Files</h5>
+                </div>
+                <div class="card-body">
+                    <p>JavaScript Object Notation files store structured data in a hierarchical, human-readable format.</p>
+                    <strong>Example:</strong>
+                    <pre><code class="language-json">[
+  {
+    "customer_id": 1,
+    "customer_name": "Acme Trucking",
+    "city": "Denver",
+    "state": "CO"
+  },
+  {
+    "customer_id": 2,
+    "customer_name": "Mountain Delivery",
+    "city": "Boulder",
+    "state": "CO"
+  }
+]</code></pre>
+                    <strong>Challenges:</strong>
+                    <ul>
+                        <li>Nested structures may not map directly to tables</li>
+                        <li>Arrays need special handling</li>
+                        <li>Large files can be memory-intensive</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card mb-3">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Excel Files</h5>
+                </div>
+                <div class="card-body">
+                    <p>Microsoft Excel spreadsheets are widely used for data management but require specific tools to read.</p>
+                    <strong>Challenges:</strong>
+                    <ul>
+                        <li>Formatting and formulas can complicate import</li>
+                        <li>Multiple sheets need to be handled separately</li>
+                        <li>Hidden data or merged cells can cause issues</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Web Services / APIs</h5>
+                </div>
+                <div class="card-body">
+                    <p>Data fetched from web services or APIs typically comes in JSON or XML format.</p>
+                    <strong>Challenges:</strong>
+                    <ul>
+                        <li>Rate limits and authentication</li>
+                        <li>Handling API changes</li>
+                        <li>Complex or nested data structures</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Direct User Input</h5>
+                </div>
+                <div class="card-body">
+                    <p>Data entered directly by users through forms or applications.</p>
+                    <strong>Challenges:</strong>
+                    <ul>
+                        <li>Input validation to prevent errors</li>
+                        <li>Handling user mistakes</li>
+                        <li>Security concerns (SQL injection)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Data Cleaning Importance</h3>
+    <p>Data cleaning is a critical step in the data import process. It helps ensure that your database contains accurate, consistent, and reliable information.</p>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    "Garbage In, Garbage Out"
+                </div>
+                <div class="card-body">
+                    <p>Poor quality input data leads to unreliable results and analysis. The quality of your database is only as good as the data you put into it.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    Database Integrity
+                </div>
+                <div class="card-body">
+                    <p>Data must adhere to constraints like unique keys, foreign key relationships, and field type restrictions to maintain the database's integrity.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    Business Decision Quality
+                </div>
+                <div class="card-body">
+                    <p>Business decisions based on database information will only be as good as the data. Clean, accurate data leads to better decisions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Common Data Quality Issues</h3>
+    <p>When importing data, you may encounter various quality issues that need to be addressed:</p>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Issue</th>
+                    <th>Example</th>
+                    <th>Solution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Missing Values</td>
+                    <td>Empty cells, NULL values, or placeholders like "N/A"</td>
+                    <td>Fill with defaults, calculate from other fields, or mark as explicitly missing</td>
+                </tr>
+                <tr>
+                    <td>Inconsistent Formatting</td>
+                    <td>Phone numbers as (303) 555-1234, 303-555-1234, or 3035551234</td>
+                    <td>Standardize formats using regular expressions or string functions</td>
+                </tr>
+                <tr>
+                    <td>Duplicate Records</td>
+                    <td>Same customer entered twice with slight variations</td>
+                    <td>Identify and merge or remove duplicates</td>
+                </tr>
+                <tr>
+                    <td>Type Mismatches</td>
+                    <td>Numbers stored as text, dates in varying formats</td>
+                    <td>Convert to appropriate data types</td>
+                </tr>
+                <tr>
+                    <td>Range Violations</td>
+                    <td>Negative quantities, impossible dates</td>
+                    <td>Validate against acceptable ranges</td>
+                </tr>
+                <tr>
+                    <td>Case Inconsistency</td>
+                    <td>Mixed case values: "Denver", "DENVER", "denver"</td>
+                    <td>Standardize case (upper, lower, or proper)</td>
+                </tr>
+                <tr>
+                    <td>Referential Integrity</td>
+                    <td>Sales referencing customers that don't exist</td>
+                    <td>Verify foreign key relationships</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 class="mt-4">SQL Commands for Data Import</h3>
+    <p>SQLite provides several SQL commands for importing data into tables:</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">INSERT Statement</h5>
+        </div>
+        <div class="card-body">
+            <p>The <code>INSERT</code> statement adds new rows to a table.</p>
+            <div class="code-block">
+                <pre><code class="language-sql">-- Insert a single row
+INSERT INTO customers (customer_id, customer_name, city, state)
+VALUES (6, 'High Plains Hauling', 'Cheyenne', 'WY');
+
+-- Insert multiple rows
+INSERT INTO customers (customer_id, customer_name, city, state)
+VALUES 
+  (7, 'Valley Transport', 'Grand Junction', 'CO'),
+  (8, 'Mountain Movers', 'Aspen', 'CO');</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">UPDATE Statement</h5>
+        </div>
+        <div class="card-body">
+            <p>The <code>UPDATE</code> statement modifies existing data in a table.</p>
+            <div class="code-block">
+                <pre><code class="language-sql">-- Update a single field for all records
+UPDATE products
+SET unit_price = unit_price * 1.05
+WHERE category = 'Fuel';
+
+-- Update multiple fields for specific records
+UPDATE customers
+SET contact_person = 'Jane Smith', phone = '555-987-6543'
+WHERE customer_id = 3;</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">INSERT or REPLACE</h5>
+        </div>
+        <div class="card-body">
+            <p>The <code>INSERT OR REPLACE</code> statement (or <code>REPLACE INTO</code>) inserts a new record or replaces an existing one if there's a primary key conflict.</p>
+            <div class="code-block">
+                <pre><code class="language-sql">-- Insert a new customer or replace if ID already exists
+INSERT OR REPLACE INTO customers (customer_id, customer_name, city, state)
+VALUES (5, 'Colorado Express Updated', 'Colorado Springs', 'CO');</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <h3>Data Validation in SQL</h3>
+    <p>SQLite provides several mechanisms for validating data during import:</p>
+    
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Constraints</h5>
+                </div>
+                <div class="card-body">
+                    <p>Database constraints enforce rules on the data:</p>
+                    <ul>
+                        <li><strong>PRIMARY KEY</strong>: Ensures unique identification</li>
+                        <li><strong>FOREIGN KEY</strong>: Ensures references exist</li>
+                        <li><strong>NOT NULL</strong>: Prevents missing values</li>
+                        <li><strong>UNIQUE</strong>: Prevents duplicate values</li>
+                        <li><strong>CHECK</strong>: Validates against specific conditions</li>
+                    </ul>
+                    <div class="code-block">
+                        <pre><code class="language-sql">CREATE TABLE drivers (
+    driver_id INTEGER PRIMARY KEY,
+    driver_name TEXT NOT NULL,
+    license_number TEXT UNIQUE,
+    hire_date TEXT,
+    status TEXT CHECK(status IN ('Active', 'Inactive', 'On Leave'))
+);</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Transactions</h5>
+                </div>
+                <div class="card-body">
+                    <p>Transactions ensure all-or-nothing operations, preventing partial updates:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">-- Begin transaction
+BEGIN TRANSACTION;
+
+-- Insert customer
+INSERT INTO customers (customer_id, customer_name)
+VALUES (9, 'New Customer');
+
+-- Insert sale for this customer
+INSERT INTO sales (sale_id, customer_id, product_id, sale_date, quantity, total_amount)
+VALUES (10, 9, 1, '2024-06-01', 100, 345.00);
+
+-- If all statements succeed, commit the transaction
+COMMIT;
+
+-- If any statement fails, roll back
+-- ROLLBACK;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Sample Data in Our Database</h3>
+    <p>For this training, we've already imported sample data into our database. Let's take a look at what's available:</p>
+    
+    <div class="code-block">
+        <pre><code class="language-sql">-- View customer data
+SELECT * FROM customers;
+
+-- View product data
+SELECT * FROM products;
+
+-- View sales data
+SELECT * FROM sales;
+
+-- View driver data
+SELECT * FROM drivers;</code></pre>
+    </div>
+    
+    <div class="alert alert-warning">
+        <h5>SQLite and Data Types</h5>
+        <p>SQLite uses a "dynamic type system" that's different from most other SQL databases. Instead of rigidly enforcing data types, SQLite is more flexible:</p>
+        <ul>
+            <li>SQLite has only five storage classes: NULL, INTEGER, REAL, TEXT, and BLOB</li>
+            <li>You can store any data type in any column (with some exceptions)</li>
+            <li>This flexibility can be both helpful and dangerous during data import</li>
+        </ul>
+        <p>For best practices, always try to maintain appropriate data types even though SQLite allows flexibility.</p>
+    </div>
+
+    <div class="text-center mt-5">
+        <button id="complete-module-btn" class="btn btn-primary btn-lg px-4">Mark as Complete</button>
+    </div>
+</div>

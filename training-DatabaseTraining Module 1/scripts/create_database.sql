@@ -1,0 +1,54 @@
+﻿-- Create database tables
+CREATE TABLE IF NOT EXISTS customers (
+    customer_id INTEGER PRIMARY KEY,
+    customer_name TEXT NOT NULL,
+    contact_person TEXT,
+    email TEXT,
+    phone TEXT,
+    address TEXT,
+    city TEXT,
+    state TEXT,
+    zip_code TEXT,
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS products (
+    product_id INTEGER PRIMARY KEY,
+    product_name TEXT NOT NULL,
+    category TEXT,
+    unit_price REAL NOT NULL,
+    unit_cost REAL NOT NULL,
+    description TEXT,
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sales (
+    sale_id INTEGER PRIMARY KEY,
+    customer_id INTEGER,
+    product_id INTEGER,
+    sale_date TEXT NOT NULL,
+    quantity REAL NOT NULL,
+    total_amount REAL NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
+    FOREIGN KEY (product_id) REFERENCES products (product_id)
+);
+
+CREATE TABLE IF NOT EXISTS drivers (
+    driver_id INTEGER PRIMARY KEY,
+    driver_name TEXT NOT NULL,
+    license_number TEXT,
+    hire_date TEXT,
+    status TEXT CHECK(status IN ('Active', 'Inactive', 'On Leave')),
+    created_date TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS deliveries (
+    delivery_id INTEGER PRIMARY KEY,
+    sale_id INTEGER,
+    driver_id INTEGER,
+    delivery_date TEXT,
+    status TEXT CHECK(status IN ('Scheduled', 'In Transit', 'Delivered', 'Failed')),
+    notes TEXT,
+    FOREIGN KEY (sale_id) REFERENCES sales (sale_id),
+    FOREIGN KEY (driver_id) REFERENCES drivers (driver_id)
+);

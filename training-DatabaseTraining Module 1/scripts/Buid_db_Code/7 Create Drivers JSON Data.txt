@@ -1,0 +1,58 @@
+# Create sample driver data in JSON format
+$driversJson = @"
+[
+  {
+    "driver_id": 1,
+    "driver_name": "Michael Johnson",
+    "license_number": "CDL12345CO",
+    "hire_date": "2020-03-15",
+    "status": "Active"
+  },
+  {
+    "driver_id": 2,
+    "driver_name": "Robert Garcia",
+    "license_number": "CDL67890CO",
+    "hire_date": "2018-07-22",
+    "status": "Active"
+  },
+  {
+    "driver_id": 3,
+    "driver_name": "David Martinez",
+    "license_number": "CDL24680CO",
+    "hire_date": "2021-01-10",
+    "status": "Active"
+  },
+  {
+    "driver_id": 4,
+    "driver_name": "James Wilson",
+    "license_number": "CDL13579CO",
+    "hire_date": "2019-05-03",
+    "status": "On Leave"
+  },
+  {
+    "driver_id": 5,
+    "driver_name": "Thomas Anderson",
+    "license_number": "CDL97531CO",
+    "hire_date": "2017-11-28",
+    "status": "Active"
+  },
+  {
+    "driver_id": 6,
+    "driver_name": "Christopher Lee",
+    "license_number": "CDL86420CO",
+    "hire_date": "2022-02-14",
+    "status": "Active"
+  },
+  {
+    "driver_id": 7,
+    "driver_name": "Daniel Brown",
+    "license_number": "CDL11223CO",
+    "hire_date": "2020-09-01",
+    "status": "Inactive"
+  }
+]
+"@
+
+$driversJson | Out-File -FilePath "$projectRoot\json_data\drivers.json" -Encoding utf8
+
+Write-Host "Sample JSON data created successfully"
