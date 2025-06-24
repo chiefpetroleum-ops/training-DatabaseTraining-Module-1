@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80">
+  <style>
+    .logo-text { font-family: Arial, sans-serif; font-weight: bold; }
+    .logo-icon { fill: #0d6efd; }
+    .tagline { font-family: Arial, sans-serif; font-size: 12px; }
+  </style>
+  <g>
+    <path class="logo-icon" d="M40,15 L50,5 L60,15 L50,40 Z" />
+    <text x="70" y="30" class="logo-text" fill="#333333" font-size="20">TRUE NORTH</text>
+    <text x="70" y="50" class="tagline" fill="#666666">DATA STRATEGIES</text>
+  </g>
+</svg>

@@ -1,0 +1,246 @@
+/* General styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Sidebar styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #d0d0d0;
+    padding: 0.75rem 1rem;
+    border-left: 3px solid transparent;
+}
+
+.sidebar .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link.active {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-left: 3px solid #0d6efd;
+}
+
+.menu-icon {
+    margin-right: 10px;
+    font-size: 1.1em;
+}
+
+/* Main content area */
+main {
+    margin-left: 16.7%; /* Align with sidebar */
+    padding-top: 15px;
+}
+
+@media (max-width: 767.98px) {
+    main {
+        margin-left: 0;
+    }
+}
+
+/* SQL Playground */
+.code-editor {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    background-color: #282c34;
+    color: #abb2bf;
+    border: 1px solid #3e4451;
+}
+
+.sql-results {
+    overflow-x: auto;
+    min-height: 200px;
+    max-height: 400px;
+}
+
+.sql-results table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sql-results table th {
+    background-color: #343a40;
+    color: white;
+    padding: 8px;
+    text-align: left;
+}
+
+.sql-results table td {
+    padding: 8px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.sql-results table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.sql-results table tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Module content styling */
+.module-section {
+    margin-bottom: 2rem;
+}
+
+.module-section h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: #212529;
+}
+
+.code-block {
+    background-color: #282c34;
+    color: #abb2bf;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+.code-block pre {
+    margin-bottom: 0;
+}
+
+.exercise-card {
+    border-left: 4px solid #0d6efd;
+    margin-bottom: 20px;
+}
+
+.info-box {
+    background-color: #e3f2fd;
+    border-left: 4px solid #0d6efd;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.warning-box {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.success-box {
+    background-color: #d4edda;
+    border-left: 4px solid #28a745;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.module-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Progress tracker */
+.progress-container {
+    padding: 15px 0;
+}
+
+.progress {
+    height: 8px;
+}
+
+/* Table styling for database diagrams */
+.db-table {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.db-table .table-header {
+    background-color: #343a40;
+    color: white;
+    padding: 8px 12px;
+    font-weight: bold;
+}
+
+.db-table .table-body {
+    padding: 0;
+}
+
+.db-table table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.db-table .primary-key {
+    font-weight: bold;
+    position: relative;
+}
+
+.db-table .primary-key:after {
+    content: "🔑";
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+.db-table .foreign-key {
+    position: relative;
+}
+
+.db-table .foreign-key:after {
+    content: "🔗";
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+/* Step-by-step guides */
+.step-guide {
+    counter-reset: step-counter;
+}
+
+.step-guide .step {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 15px;
+}
+
+.step-guide .step:before {
+    content: counter(step-counter);
+    counter-increment: step-counter;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: static;
+        height: auto;
+        padding-top: 15px;
+    }
+    
+    main {
+        margin-left: 0;
+    }
+}

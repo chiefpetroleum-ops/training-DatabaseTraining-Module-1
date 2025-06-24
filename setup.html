@@ -1,0 +1,393 @@
+<div class="module-section">
+    <div class="alert alert-info">
+        <h4>Environment Setup</h4>
+        <p>In this module, we'll set up our database environment using SQLite.js, which is already included in this web application. Everything runs in your browser - no installation required!</p>
+    </div>
+
+    <h3>Database Environment Overview</h3>
+    <p>Traditional database setups require installing database software on your computer. However, for this training, we're using a browser-based approach with these components:</p>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">SQLite.js</h5>
+                    <p class="card-text">A JavaScript implementation of SQLite that runs entirely in your browser. This allows us to create and query databases without installing any software.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">SQL Playground</h5>
+                    <p class="card-text">An interactive area where you can write and execute SQL queries against our sample database, seeing results immediately.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Sample Data</h5>
+                    <p class="card-text">Pre-loaded database tables with sample data for our petroleum sales example, allowing you to practice with realistic data.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Database Schema</h3>
+    <p>Our petroleum sales database consists of five main tables, each with specific fields and relationships:</p>
+    
+    <div class="accordion mb-4" id="schemaAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingCustomers">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCustomers" aria-expanded="true" aria-controls="collapseCustomers">
+                    Customers Table
+                </button>
+            </h2>
+            <div id="collapseCustomers" class="accordion-collapse collapse show" aria-labelledby="headingCustomers" data-bs-parent="#schemaAccordion">
+                <div class="accordion-body">
+                    <p>Stores information about companies that purchase fuel products.</p>
+                    <div class="db-table">
+                        <div class="table-header">Customers</div>
+                        <div class="table-body">
+                            <table class="table table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Column</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="primary-key">customer_id</td>
+                                        <td>INTEGER</td>
+                                        <td>Unique identifier for each customer</td>
+                                    </tr>
+                                    <tr>
+                                        <td>customer_name</td>
+                                        <td>TEXT</td>
+                                        <td>Company name</td>
+                                    </tr>
+                                    <tr>
+                                        <td>contact_person</td>
+                                        <td>TEXT</td>
+                                        <td>Primary contact name</td>
+                                    </tr>
+                                    <tr>
+                                        <td>email</td>
+                                        <td>TEXT</td>
+                                        <td>Contact email address</td>
+                                    </tr>
+                                    <tr>
+                                        <td>phone</td>
+                                        <td>TEXT</td>
+                                        <td>Contact phone number</td>
+                                    </tr>
+                                    <tr>
+                                        <td>address</td>
+                                        <td>TEXT</td>
+                                        <td>Street address</td>
+                                    </tr>
+                                    <tr>
+                                        <td>city</td>
+                                        <td>TEXT</td>
+                                        <td>City</td>
+                                    </tr>
+                                    <tr>
+                                        <td>state</td>
+                                        <td>TEXT</td>
+                                        <td>State/province</td>
+                                    </tr>
+                                    <tr>
+                                        <td>zip_code</td>
+                                        <td>TEXT</td>
+                                        <td>ZIP or postal code</td>
+                                    </tr>
+                                    <tr>
+                                        <td>created_date</td>
+                                        <td>TEXT</td>
+                                        <td>Date customer was added to system</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingProducts">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProducts" aria-expanded="false" aria-controls="collapseProducts">
+                    Products Table
+                </button>
+            </h2>
+            <div id="collapseProducts" class="accordion-collapse collapse" aria-labelledby="headingProducts" data-bs-parent="#schemaAccordion">
+                <div class="accordion-body">
+                    <p>Contains all products sold by the company, including different types of fuel and lubricants.</p>
+                    <div class="db-table">
+                        <div class="table-header">Products</div>
+                        <div class="table-body">
+                            <table class="table table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Column</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="primary-key">product_id</td>
+                                        <td>INTEGER</td>
+                                        <td>Unique identifier for each product</td>
+                                    </tr>
+                                    <tr>
+                                        <td>product_name</td>
+                                        <td>TEXT</td>
+                                        <td>Name of the product</td>
+                                    </tr>
+                                    <tr>
+                                        <td>category</td>
+                                        <td>TEXT</td>
+                                        <td>Product category (Fuel, Lubricant, etc.)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>unit_price</td>
+                                        <td>REAL</td>
+                                        <td>Selling price per unit</td>
+                                    </tr>
+                                    <tr>
+                                        <td>unit_cost</td>
+                                        <td>REAL</td>
+                                        <td>Cost price per unit</td>
+                                    </tr>
+                                    <tr>
+                                        <td>description</td>
+                                        <td>TEXT</td>
+                                        <td>Product description</td>
+                                    </tr>
+                                    <tr>
+                                        <td>created_date</td>
+                                        <td>TEXT</td>
+                                        <td>Date product was added to system</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSales">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSales" aria-expanded="false" aria-controls="collapseSales">
+                    Sales Table
+                </button>
+            </h2>
+            <div id="collapseSales" class="accordion-collapse collapse" aria-labelledby="headingSales" data-bs-parent="#schemaAccordion">
+                <div class="accordion-body">
+                    <p>Records of all sales transactions between customers and products.</p>
+                    <div class="db-table">
+                        <div class="table-header">Sales</div>
+                        <div class="table-body">
+                            <table class="table table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Column</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="primary-key">sale_id</td>
+                                        <td>INTEGER</td>
+                                        <td>Unique identifier for each sale</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="foreign-key">customer_id</td>
+                                        <td>INTEGER</td>
+                                        <td>Reference to the customer who made the purchase</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="foreign-key">product_id</td>
+                                        <td>INTEGER</td>
+                                        <td>Reference to the product that was purchased</td>
+                                    </tr>
+                                    <tr>
+                                        <td>sale_date</td>
+                                        <td>TEXT</td>
+                                        <td>Date of the sale</td>
+                                    </tr>
+                                    <tr>
+                                        <td>quantity</td>
+                                        <td>REAL</td>
+                                        <td>Amount of product purchased</td>
+                                    </tr>
+                                    <tr>
+                                        <td>total_amount</td>
+                                        <td>REAL</td>
+                                        <td>Total sale amount</td>
+                                    </tr>
+                                    <tr>
+                                        <td>cost</td>
+                                        <td>REAL</td>
+                                        <td>Total cost of goods sold</td>
+                                    </tr>
+                                    <tr>
+                                        <td>profit</td>
+                                        <td>REAL</td>
+                                        <td>Profit from the sale (total_amount - cost)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingDrivers">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDrivers" aria-expanded="false" aria-controls="collapseDrivers">
+                    Drivers Table
+                </button>
+            </h2>
+            <div id="collapseDrivers" class="accordion-collapse collapse" aria-labelledby="headingDrivers" data-bs-parent="#schemaAccordion">
+                <div class="accordion-body">
+                    <p>Information about delivery drivers employed by the company.</p>
+                    <div class="db-table">
+                        <div class="table-header">Drivers</div>
+                        <div class="table-body">
+                            <table class="table table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Column</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="primary-key">driver_id</td>
+                                        <td>INTEGER</td>
+                                        <td>Unique identifier for each driver</td>
+                                    </tr>
+                                    <tr>
+                                        <td>driver_name</td>
+                                        <td>TEXT</td>
+                                        <td>Driver's full name</td>
+                                    </tr>
+                                    <tr>
+                                        <td>license_number</td>
+                                        <td>TEXT</td>
+                                        <td>Driver's license number</td>
+                                    </tr>
+                                    <tr>
+                                        <td>hire_date</td>
+                                        <td>TEXT</td>
+                                        <td>Date driver was hired</td>
+                                    </tr>
+                                    <tr>
+                                        <td>status</td>
+                                        <td>TEXT</td>
+                                        <td>Employment status (Active, Inactive, On Leave)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>created_date</td>
+                                        <td>TEXT</td>
+                                        <td>Date driver was added to system</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingDeliveries">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDeliveries" aria-expanded="false" aria-controls="collapseDeliveries">
+                    Deliveries Table
+                </button>
+            </h2>
+            <div id="collapseDeliveries" class="accordion-collapse collapse" aria-labelledby="headingDeliveries" data-bs-parent="#schemaAccordion">
+                <div class="accordion-body">
+                    <p>Records of product deliveries to customers.</p>
+                    <div class="db-table">
+                        <div class="table-header">Deliveries</div>
+                        <div class="table-body">
+                            <table class="table table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Column</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="primary-key">delivery_id</td>
+                                        <td>INTEGER</td>
+                                        <td>Unique identifier for each delivery</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="foreign-key">sale_id</td>
+                                        <td>INTEGER</td>
+                                        <td>Reference to the sale being delivered</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="foreign-key">driver_id</td>
+                                        <td>INTEGER</td>
+                                        <td>Reference to the driver making the delivery</td>
+                                    </tr>
+                                    <tr>
+                                        <td>delivery_date</td>
+                                        <td>TEXT</td>
+                                        <td>Date of delivery</td>
+                                    </tr>
+                                    <tr>
+                                        <td>status</td>
+                                        <td>TEXT</td>
+                                        <td>Delivery status (Scheduled, In Transit, Delivered, Failed)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>notes</td>
+                                        <td>TEXT</td>
+                                        <td>Additional notes about the delivery</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Database Relationships Diagram</h3>
+    <p>The diagram below shows how the tables in our database are related to each other:</p>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="relationship-diagram text-center">
+                <img src="images/database-relationships.png" alt="Database Relationships Diagram" class="img-fluid" onerror="this.src='https://via.placeholder.com/800x400?text=Database+Relationships+Diagram'">
+            </div>
+        </div>
+    </div>
+    
+    <div class="alert alert-success">
+        <h4>Environment Ready!</h4>
+        <p>Your database environment is already set up and ready to use. The sample data has been loaded, and you can start exploring the database using the SQL Playground in the next modules.</p>
+        <p>To verify everything is working, try running this simple query in the SQL Playground (available in the next module):</p>
+        <pre><code class="language-sql">SELECT * FROM customers LIMIT 3;</code></pre>
+    </div>
+
+    <div class="text-center mt-5">
+        <button id="complete-module-btn" class="btn btn-primary btn-lg px-4">Mark as Complete</button>
+    </div>
+</div>

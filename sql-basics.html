@@ -1,0 +1,607 @@
+<div class="module-section">
+    <div class="alert alert-info">
+        <h4>SQL Basics</h4>
+        <p>In this module, we'll learn the fundamentals of SQL (Structured Query Language) and how to write basic queries to retrieve and manipulate data.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <h3>Introduction to SQL</h3>
+            <p>SQL (Structured Query Language) is the standard language for working with relational databases. It allows you to:</p>
+            <ul>
+                <li>Query data (retrieve information)</li>
+                <li>Insert new records</li>
+                <li>Update existing records</li>
+                <li>Delete records</li>
+                <li>Create and modify database structures</li>
+                <li>Control access to data</li>
+            </ul>
+            <p>SQL is both powerful and relatively easy to learn, with a syntax that resembles plain English. It's used across virtually all relational database systems, including SQLite, MySQL, PostgreSQL, SQL Server, and Oracle.</p>
+        </div>
+        <div class="col-lg-4">
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">SQL Playground</h5>
+                    <p>You can try all the SQL examples in this module using the SQL Playground at the bottom of the page.</p>
+                    <p>Simply copy the code examples, paste them into the SQL query area, and click "Run Query" to see the results!</p>
+                </div>
+            </div>
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">SQL Syntax Notes</h5>
+                    <ul>
+                        <li>SQL keywords are typically written in UPPERCASE (though this is not required)</li>
+                        <li>Statements end with a semicolon <code>;</code></li>
+                        <li>White space is ignored</li>
+                        <li>Comments start with <code>--</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mt-4">The SELECT Statement</h3>
+    <p>The <code>SELECT</code> statement is the most commonly used SQL command. It allows you to retrieve data from one or more tables.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Basic SELECT Syntax</h5>
+        </div>
+        <div class="card-body">
+            <div class="code-block">
+                <pre><code class="language-sql">SELECT column1, column2, ...
+FROM table_name
+WHERE condition
+ORDER BY column1, column2, ... ASC|DESC
+LIMIT number;</code></pre>
+            </div>
+            <p class="mt-3">Where:</p>
+            <ul>
+                <li><code>SELECT column1, column2, ...</code> - Specifies the columns to retrieve</li>
+                <li><code>FROM table_name</code> - Specifies the table to retrieve data from</li>
+                <li><code>WHERE condition</code> - Optional. Filters records that meet a specified condition</li>
+                <li><code>ORDER BY column1, ...</code> - Optional. Sorts the result by one or more columns</li>
+                <li><code>LIMIT number</code> - Optional. Limits the number of records returned</li>
+            </ul>
+        </div>
+    </div>
+
+    <h4>Example: Basic SELECT Queries</h4>
+    <p>Let's try some basic SELECT queries on our petroleum sales database:</p>
+    
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    Retrieving All Columns
+                </div>
+                <div class="card-body">
+                    <p>To retrieve all columns from a table, use the <code>*</code> wildcard:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">-- Get all columns from the customers table
+SELECT *
+FROM customers;</code></pre>
+                    </div>
+                    <p class="mt-3">This returns all columns and all rows from the customers table.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    Retrieving Specific Columns
+                </div>
+                <div class="card-body">
+                    <p>To retrieve only specific columns, list them after the SELECT keyword:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">-- Get only name and city from customers
+SELECT customer_name, city, state
+FROM customers;</code></pre>
+                    </div>
+                    <p class="mt-3">This returns only the specified columns for all rows in the customers table.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    Limiting Results
+                </div>
+                <div class="card-body">
+                    <p>To limit the number of rows returned, use the LIMIT clause:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">-- Get only the first 3 products
+SELECT *
+FROM products
+LIMIT 3;</code></pre>
+                    </div>
+                    <p class="mt-3">This returns all columns for only the first 3 rows in the products table.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    Sorting Results
+                </div>
+                <div class="card-body">
+                    <p>To sort the results, use the ORDER BY clause:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">-- Get products sorted by price (highest first)
+SELECT product_name, unit_price
+FROM products
+ORDER BY unit_price DESC;</code></pre>
+                    </div>
+                    <p class="mt-3">This returns product names and prices sorted from highest to lowest price.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Filtering Data with WHERE</h3>
+    <p>The <code>WHERE</code> clause allows you to filter records based on specific conditions.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">WHERE Clause Operators</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Operator</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>=</td>
+                            <td>Equal</td>
+                            <td><code>WHERE city = 'Denver'</code></td>
+                        </tr>
+                        <tr>
+                            <td>!=</td>
+                            <td>Not equal</td>
+                            <td><code>WHERE city != 'Denver'</code></td>
+                        </tr>
+                        <tr>
+                            <td>&gt;</td>
+                            <td>Greater than</td>
+                            <td><code>WHERE unit_price > 3.50</code></td>
+                        </tr>
+                        <tr>
+                            <td>&lt;</td>
+                            <td>Less than</td>
+                            <td><code>WHERE unit_price < 3.00</code></td>
+                        </tr>
+                        <tr>
+                            <td>&gt;=</td>
+                            <td>Greater than or equal</td>
+                            <td><code>WHERE unit_price >= 3.50</code></td>
+                        </tr>
+                        <tr>
+                            <td>&lt;=</td>
+                            <td>Less than or equal</td>
+                            <td><code>WHERE unit_price <= 3.00</code></td>
+                        </tr>
+                        <tr>
+                            <td>BETWEEN</td>
+                            <td>Between a range</td>
+                            <td><code>WHERE unit_price BETWEEN 3.00 AND 4.00</code></td>
+                        </tr>
+                        <tr>
+                            <td>LIKE</td>
+                            <td>Pattern matching</td>
+                            <td><code>WHERE customer_name LIKE 'A%'</code></td>
+                        </tr>
+                        <tr>
+                            <td>IN</td>
+                            <td>Matches values in a list</td>
+                            <td><code>WHERE city IN ('Denver', 'Boulder')</code></td>
+                        </tr>
+                        <tr>
+                            <td>AND</td>
+                            <td>Logical AND</td>
+                            <td><code>WHERE city = 'Denver' AND state = 'CO'</code></td>
+                        </tr>
+                        <tr>
+                            <td>OR</td>
+                            <td>Logical OR</td>
+                            <td><code>WHERE city = 'Denver' OR city = 'Boulder'</code></td>
+                        </tr>
+                        <tr>
+                            <td>NOT</td>
+                            <td>Negates a condition</td>
+                            <td><code>WHERE NOT city = 'Denver'</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <h4>Example: Filtering Queries</h4>
+    <p>Let's try some queries with WHERE clauses:</p>
+    
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    Basic Filtering
+                </div>
+                <div class="card-body">
+                    <p>Find all customers in Denver:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT customer_name, address, phone
+FROM customers
+WHERE city = 'Denver';</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    Numeric Comparison
+                </div>
+                <div class="card-body">
+                    <p>Find all products with a price over $3.50:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT product_name, unit_price
+FROM products
+WHERE unit_price > 3.50;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    Multiple Conditions
+                </div>
+                <div class="card-body">
+                    <p>Find fuel products with a price between $3.00 and $4.00:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT product_name, category, unit_price
+FROM products
+WHERE category = 'Fuel'
+AND unit_price BETWEEN 3.00 AND 4.00;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    Pattern Matching with LIKE
+                </div>
+                <div class="card-body">
+                    <p>Find all customers whose names contain "Mountain":</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT customer_name, city
+FROM customers
+WHERE customer_name LIKE '%Mountain%';</code></pre>
+                    </div>
+                    <p class="mt-2 small">Note: % is a wildcard that matches any sequence of characters.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <h5>LIKE Wildcards</h5>
+        <ul>
+            <li><code>%</code> - Matches any sequence of characters (including zero characters)</li>
+            <li><code>_</code> - Matches any single character</li>
+        </ul>
+        <p>Examples:</p>
+        <ul>
+            <li><code>LIKE 'A%'</code> - Starts with 'A'</li>
+            <li><code>LIKE '%Inc'</code> - Ends with 'Inc'</li>
+            <li><code>LIKE '%Oil%'</code> - Contains 'Oil' anywhere</li>
+            <li><code>LIKE '__-___-____'</code> - Matches pattern like '12-345-6789'</li>
+        </ul>
+    </div>
+
+    <h3 class="mt-4">Calculated Fields and Functions</h3>
+    <p>SQL allows you to create calculated fields and use functions to transform data in your queries.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Common SQL Functions</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Numeric Functions</h6>
+                    <ul>
+                        <li><code>AVG(column)</code> - Average of values</li>
+                        <li><code>SUM(column)</code> - Sum of values</li>
+                        <li><code>COUNT(column)</code> - Count of non-NULL values</li>
+                        <li><code>MAX(column)</code> - Maximum value</li>
+                        <li><code>MIN(column)</code> - Minimum value</li>
+                        <li><code>ROUND(value, decimals)</code> - Round to specified decimals</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>String Functions</h6>
+                    <ul>
+                        <li><code>UPPER(text)</code> - Convert to uppercase</li>
+                        <li><code>LOWER(text)</code> - Convert to lowercase</li>
+                        <li><code>LENGTH(text)</code> - Get string length</li>
+                        <li><code>SUBSTR(text, start, length)</code> - Extract substring</li>
+                        <li><code>TRIM(text)</code> - Remove leading/trailing spaces</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Example: Calculated Fields and Functions</h4>
+    <p>Let's try some queries with calculated fields and functions:</p>
+    
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    Simple Calculations
+                </div>
+                <div class="card-body">
+                    <p>Calculate profit margin for each product:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  product_name,
+  unit_price,
+  unit_cost,
+  (unit_price - unit_cost) AS profit_per_unit,
+  ROUND((unit_price - unit_cost) / unit_price * 100, 2) AS profit_margin_percent
+FROM products;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    String Functions
+                </div>
+                <div class="card-body">
+                    <p>Format customer names and locations:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  UPPER(customer_name) AS customer_name_upper,
+  city || ', ' || state AS location,
+  LENGTH(customer_name) AS name_length
+FROM customers;</code></pre>
+                    </div>
+                    <p class="mt-2 small">Note: <code>||</code> is the string concatenation operator in SQLite.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    Date Functions
+                </div>
+                <div class="card-body">
+                    <p>Extract year and month from sale dates:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  sale_id,
+  sale_date,
+  SUBSTR(sale_date, 1, 4) AS year,
+  SUBSTR(sale_date, 6, 2) AS month,
+  total_amount
+FROM sales;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    Using Aggregate Functions
+                </div>
+                <div class="card-body">
+                    <p>Calculate summary statistics for sales:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  COUNT(*) AS total_sales,
+  SUM(total_amount) AS total_revenue,
+  AVG(total_amount) AS average_sale,
+  MAX(total_amount) AS largest_sale,
+  MIN(total_amount) AS smallest_sale
+FROM sales;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Grouping Data</h3>
+    <p>The <code>GROUP BY</code> clause allows you to group rows that have the same values in specified columns, which is particularly useful with aggregate functions.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">GROUP BY Syntax</h5>
+        </div>
+        <div class="card-body">
+            <div class="code-block">
+                <pre><code class="language-sql">SELECT column1, column2, ..., aggregate_function(column)
+FROM table_name
+WHERE condition
+GROUP BY column1, column2, ...
+HAVING condition
+ORDER BY column1, column2, ...;</code></pre>
+            </div>
+            <p class="mt-3">Where:</p>
+            <ul>
+                <li><code>GROUP BY column1, column2, ...</code> - Specifies the columns to group by</li>
+                <li><code>HAVING condition</code> - Optional. Filters groups based on a specified condition (like WHERE for groups)</li>
+            </ul>
+        </div>
+    </div>
+
+    <h4>Example: Grouping Queries</h4>
+    <p>Let's try some queries with GROUP BY:</p>
+    
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    Basic Grouping
+                </div>
+                <div class="card-body">
+                    <p>Calculate total sales by product category:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  category,
+  COUNT(*) AS product_count,
+  AVG(unit_price) AS average_price,
+  SUM(unit_price) AS total_price
+FROM products
+GROUP BY category;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    Grouping with HAVING
+                </div>
+                <div class="card-body">
+                    <p>Find products with above-average profit margins by category:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  category,
+  product_name,
+  ROUND((unit_price - unit_cost) / unit_price * 100, 2) AS profit_margin_percent
+FROM products
+GROUP BY category, product_id
+HAVING profit_margin_percent > (
+  SELECT AVG((unit_price - unit_cost) / unit_price * 100)
+  FROM products
+)
+ORDER BY profit_margin_percent DESC;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        <h5>WHERE vs. HAVING</h5>
+        <p>Both WHERE and HAVING are used to filter data, but they work differently:</p>
+        <ul>
+            <li><strong>WHERE</strong> filters individual rows <em>before</em> they are grouped</li>
+            <li><strong>HAVING</strong> filters groups <em>after</em> the rows are grouped</li>
+        </ul>
+        <p>Example:</p>
+        <div class="code-block">
+            <pre><code class="language-sql">SELECT category, COUNT(*) AS product_count
+FROM products
+WHERE unit_price > 3.00  -- Filters individual products first
+GROUP BY category
+HAVING product_count > 1;  -- Then filters the groups</code></pre>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Practical Examples</h3>
+    <p>Let's put everything together with some practical queries for our petroleum sales database:</p>
+    
+    <div class="accordion mb-4" id="practicalExamples">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingExample1">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample1" aria-expanded="true" aria-controls="collapseExample1">
+                    Find top-selling products
+                </button>
+            </h2>
+            <div id="collapseExample1" class="accordion-collapse collapse show" aria-labelledby="headingExample1" data-bs-parent="#practicalExamples">
+                <div class="accordion-body">
+                    <p>This query finds the top-selling products by total sales amount:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  p.product_name,
+  p.category,
+  COUNT(s.sale_id) AS sale_count,
+  SUM(s.quantity) AS total_quantity,
+  SUM(s.total_amount) AS total_revenue
+FROM 
+  sales s
+JOIN 
+  products p ON s.product_id = p.product_id
+GROUP BY 
+  p.product_id
+ORDER BY 
+  total_revenue DESC;</code></pre>
+                    </div>
+                    <p class="mt-3">Note: This query uses a JOIN, which we'll cover in the next module.</p>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingExample2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2">
+                    Customer purchase statistics
+                </button>
+            </h2>
+            <div id="collapseExample2" class="accordion-collapse collapse" aria-labelledby="headingExample2" data-bs-parent="#practicalExamples">
+                <div class="accordion-body">
+                    <p>This query calculates purchase statistics for each customer:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  c.customer_name,
+  c.city,
+  COUNT(s.sale_id) AS order_count,
+  SUM(s.total_amount) AS total_spent,
+  AVG(s.total_amount) AS average_order,
+  MIN(s.sale_date) AS first_purchase,
+  MAX(s.sale_date) AS most_recent_purchase
+FROM 
+  customers c
+LEFT JOIN 
+  sales s ON c.customer_id = s.customer_id
+GROUP BY 
+  c.customer_id
+ORDER BY 
+  total_spent DESC;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingExample3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample3" aria-expanded="false" aria-controls="collapseExample3">
+                    Monthly sales analysis
+                </button>
+            </h2>
+            <div id="collapseExample3" class="accordion-collapse collapse" aria-labelledby="headingExample3" data-bs-parent="#practicalExamples">
+                <div class="accordion-body">
+                    <p>This query analyzes sales by month:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  SUBSTR(sale_date, 1, 7) AS month,
+  COUNT(*) AS sale_count,
+  SUM(quantity) AS total_quantity,
+  SUM(total_amount) AS total_revenue,
+  SUM(profit) AS total_profit,
+  ROUND(AVG(profit / total_amount) * 100, 2) AS avg_profit_margin
+FROM 
+  sales
+GROUP BY 
+  month
+ORDER BY 
+  month;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <button id="complete-module-btn" class="btn btn-primary btn-lg px-4">Mark as Complete</button>
+    </div>
+</div>
