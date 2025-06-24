@@ -231,13 +231,24 @@ async function loadModule(moduleName) {
       }
     }
 
-    document.getElementById("module-content").innerHTML = content;
-
+    // First check if SQL playground should be shown
     const showSql = ["sql-basics", "joins", "exercises", "project"].includes(moduleName);
     const sqlPlayground = document.getElementById("sql-playground");
     if (sqlPlayground) {
       sqlPlayground.classList.toggle("d-none", !showSql);
+      
+      // Move SQL playground to top of content area when visible
+      if (showSql) {
+        const contentArea = document.getElementById("content-area");
+        const moduleContent = document.getElementById("module-content");
+        if (contentArea && moduleContent) {
+          contentArea.insertBefore(sqlPlayground, moduleContent);
+        }
+      }
     }
+
+    // Then load the module content
+    document.getElementById("module-content").innerHTML = content;
 
     document.querySelectorAll("pre code").forEach((block) => {
       if (window.hljs) {
