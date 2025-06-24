@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interactive SQLite database training with SQL playground" />
+  <meta name="keywords" content="SQLite, SQL, training, petroleum, database" />
+  <meta name="author" content="True North Data Strategies" />
+  <title>Interactive Database Training</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💾</text></svg>">
+
+  <!-- External CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" rel="stylesheet">
+
+  <!-- Local stylesheet (root path) -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+        <div class="position-sticky pt-3">
+          <div class="logo-container text-center mb-4">
+            <h3 class="text-white">Database Training</h3>
+            <p class="text-muted">Module 1: SQLite Fundamentals</p>
+          </div>
+          <ul class="nav flex-column" id="sidebar-menu">
+            <li class="nav-item"><a class="nav-link active" href="#welcome" data-module="welcome">📚 Welcome</a></li>
+            <li class="nav-item"><a class="nav-link" href="#concepts" data-module="concepts">💡 Database Concepts</a></li>
+            <li class="nav-item"><a class="nav-link" href="#setup" data-module="setup">🛠️ Environment Setup</a></li>
+            <li class="nav-item"><a class="nav-link" href="#data-import" data-module="data-import">📊 Data Import & Cleaning</a></li>
+            <li class="nav-item"><a class="nav-link" href="#sql-basics" data-module="sql-basics">📝 SQL Basics</a></li>
+            <li class="nav-item"><a class="nav-link" href="#joins" data-module="joins">🔗 Joins & Relationships</a></li>
+            <li class="nav-item"><a class="nav-link" href="#exercises" data-module="exercises">🏋️ Practice Exercises</a></li>
+            <li class="nav-item"><a class="nav-link" href="#project" data-module="project">🚚 Delivery Tracking Project</a></li>
+            <li class="nav-item"><a class="nav-link" href="#summary" data-module="summary">🎓 Summary</a></li>
+          </ul>
+          <hr class="my-3 bg-secondary">
+          <div class="text-center text-muted small py-2">True North Data Strategies</div>
+        </div>
+      </nav>
+
+      <!-- Main content -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2" id="page-title">Welcome to Database Training</h1>
+          <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+              <button type="button" id="prev-btn" class="btn btn-sm btn-outline-secondary">Previous</button>
+              <button type="button" id="next-btn" class="btn btn-sm btn-outline-primary">Next</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic module content -->
+        <div id="module-content"></div>
+
+        <!-- SQL Playground -->
+        <div id="sql-playground" class="mt-4 d-none">
+          <div class="card">
+            <div class="card-header bg-dark text-white">
+              <h5 class="mb-0">SQL Playground</h5>
+            </div>
+            <div class="card-body">
+              <div class="form-group mb-3">
+                <label for="sql-query">Enter SQL Query:</label>
+                <textarea class="form-control code-editor" id="sql-query" rows="5" placeholder="SELECT * FROM customers;"></textarea>
+              </div>
+              <button id="run-sql" class="btn btn-primary">Run Query</button>
+              <button id="clear-results" class="btn btn-secondary">Clear Results</button>
+              <button id="reset-db" class="btn btn-warning">Reset Database</button>
+            </div>
+          </div>
+          <div class="card mt-3">
+            <div class="card-header bg-dark text-white"><h5 class="mb-0">Query Results</h5></div>
+            <div class="card-body">
+              <div id="sql-results" class="sql-results text-muted text-center py-5">
+                No results to display. Run a query to see results here.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="progress-container mt-5 mb-3">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Progress:</span>
+            <span class="text-muted" id="progress-text">0/9 completed</span>
+          </div>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- External JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+
+  <!-- Local App Script -->
+  <script src="app.js"></script>
+</body>
+</html>
