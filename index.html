@@ -37,25 +37,95 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+    .btn {
+      display: inline-block;
+      background-color: #0d6efd;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .btn-outline {
+      background-color: transparent;
+      color: #0d6efd;
+      border: 1px solid #0d6efd;
+      margin-left: 10px;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
   </style>
-  <script>
-    window.onload = function() {
-      // Redirect to the correct page
-      setTimeout(function() {
-        window.location.href = "training-DatabaseTraining Module 1/index.html";
-      }, 1500);
-    };
-  </script>
 </head>
 <body>
   <div class="container">
     <h1>Interactive Database Training</h1>
     <p>Welcome to the SQLite Database Training Module</p>
-    <div class="loading">
-      <div class="spinner"></div>
+    
+    <p>Click below to start the training or reset your progress:</p>
+    
+    <div>
+      <a href="welcome.html" class="btn">Start Training</a>
+      <a href="reset.html" class="btn btn-outline">Reset Progress</a>
     </div>
-    <p>Redirecting to training module...</p>
-    <p>If you are not redirected automatically, <a href="training-DatabaseTraining Module 1/index.html">click here</a>.</p>
+    
+    <p style="margin-top: 30px; font-size: 0.9em; color: #6c757d;">
+      Module 1: SQLite Fundamentals<br>
+      True North Data Strategies
+    </p>
   </div>
+  
+  <script>
+    // Check if localStorage exists
+    if (localStorage.getItem("dbTraining_completedModules")) {
+      const completedModules = JSON.parse(localStorage.getItem("dbTraining_completedModules"));
+      if (completedModules && completedModules.length > 0) {
+        document.querySelector(".container").insertAdjacentHTML("beforeend", 
+          "<p style='margin-top: 20px; color: #28a745;'>You have progress saved. Click 'Start Training' to continue where you left off.</p>"
+        );
+      }
+    }
+  </script>
+<script>
+// Add reset button
+document.addEventListener("DOMContentLoaded", function() {
+  const resetLink = document.createElement("a");
+  resetLink.textContent = "Reset Progress";
+  resetLink.href = "reset-progress.html";
+  resetLink.style.position = "fixed";
+  resetLink.style.bottom = "20px";
+  resetLink.style.right = "20px";
+  resetLink.style.padding = "10px 15px";
+  resetLink.style.backgroundColor = "#dc3545";
+  resetLink.style.color = "white";
+  resetLink.style.textDecoration = "none";
+  resetLink.style.borderRadius = "4px";
+  resetLink.style.zIndex = "9999";
+  resetLink.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+  document.body.appendChild(resetLink);
+});
+</script>
+<script>
+// Add reset button
+document.addEventListener('DOMContentLoaded', function() {
+  const resetLink = document.createElement('a');
+  resetLink.textContent = 'Reset Progress';
+  resetLink.href = 'reset-progress.html';
+  resetLink.style.position = 'fixed';
+  resetLink.style.bottom = '20px';
+  resetLink.style.right = '20px';
+  resetLink.style.padding = '10px 15px';
+  resetLink.style.backgroundColor = '#dc3545';
+  resetLink.style.color = 'white';
+  resetLink.style.textDecoration = 'none';
+  resetLink.style.borderRadius = '4px';
+  resetLink.style.zIndex = '9999';
+  resetLink.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+  document.body.appendChild(resetLink);
+});
+</script>
 </body>
 </html>
+
+

@@ -142,6 +142,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 function setupEventListeners() {
+  // Add reset link to sidebar
+  const sidebarMenu = document.querySelector("#sidebar-menu");
+  if (sidebarMenu) {
+    const resetLi = document.createElement("li");
+    resetLi.className = "nav-item";
+    resetLi.innerHTML = '<a class="nav-link text-danger" href="reset.html">🔄 Reset Progress</a>';
+    sidebarMenu.appendChild(resetLi);
+  }
   document.querySelectorAll("#sidebar-menu .nav-link").forEach((link) => {
     link.addEventListener("click", function (e) {
       e.preventDefault();
@@ -448,3 +456,4 @@ function resetDatabase() {
     `;
   }
 }
+

@@ -1,80 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reset Training Progress</title>
-  <style>
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f8f9fa;
-    }
-    .card {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 30px;
-      text-align: center;
-      max-width: 500px;
-    }
-    h1 {
-      color: #0d6efd;
-    }
-    .btn {
-      background-color: #0d6efd;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 20px;
-    }
-    .btn:hover {
-      background-color: #0b5ed7;
-    }
-    .message {
-      margin-top: 20px;
-      padding: 10px;
-      border-radius: 4px;
-      display: none;
-    }
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Progress</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+        .success {
+            color: green;
+            display: none;
+            margin-top: 20px;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #0d6efd;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Reset Training Progress</h1>
-    <p>Click the button below to reset your training progress. This will clear all completed modules and return you to the beginning of the course.</p>
-    <button id="resetBtn" class="btn">Reset Progress</button>
-    <div id="message" class="message"></div>
-  </div>
+    <div class="container">
+        <h1>Reset Training Progress</h1>
+        <p>Click the button below to reset your progress in the database training module.</p>
+        <button id="resetBtn">Reset My Progress</button>
+        <p id="success" class="success">Your progress has been reset successfully!</p>
+        <a href="index.html">Return to Training</a>
+    </div>
 
-  <script>
-    document.getElementById("resetBtn").addEventListener("click", function() {
-      // Clear all localStorage items related to the training
-      localStorage.removeItem("dbTraining_completedModules");
-      
-      // Show success message
-      const messageEl = document.getElementById("message");
-      messageEl.textContent = "Progress reset successfully! You can now return to the training.";
-      messageEl.classList.add("success");
-      messageEl.style.display = "block";
-      
-      // Add link to return to training
-      setTimeout(function() {
-        messageEl.innerHTML += "<br><br><a href='index.html'>Return to Training</a>";
-      }, 1000);
-    });
-  </script>
+    <script>
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            localStorage.removeItem('dbTraining_completedModules');
+            document.getElementById('success').style.display = 'block';
+            this.disabled = true;
+        });
+    </script>
 </body>
 </html>
