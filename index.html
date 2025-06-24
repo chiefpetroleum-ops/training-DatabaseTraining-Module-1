@@ -18,6 +18,85 @@
   
   <!-- Additional sidebar fix styles -->
   <style>
+    /* Dark mode styles */
+    body.dark-mode {
+      background-color: #1a1a1a;
+      color: #e0e0e0;
+    }
+    
+    body.dark-mode main {
+      background-color: #1a1a1a;
+    }
+    
+    body.dark-mode .card {
+      background-color: #2d2d2d;
+      border-color: #444;
+    }
+    
+    body.dark-mode .card-header {
+      background-color: #1a1a1a !important;
+      border-color: #444;
+    }
+    
+    body.dark-mode .form-control {
+      background-color: #2d2d2d;
+      color: #e0e0e0;
+      border-color: #444;
+    }
+    
+    body.dark-mode .table {
+      color: #e0e0e0;
+    }
+    
+    body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    body.dark-mode .alert-info {
+      background-color: #1e3a5f;
+      color: #9fc5e8;
+      border-color: #2d5a8e;
+    }
+    
+    body.dark-mode .border-bottom {
+      border-color: #444 !important;
+    }
+    
+    body.dark-mode .footer {
+      border-color: #444;
+    }
+    
+    body.dark-mode #sql-playground {
+      background-color: #2d2d2d;
+    }
+    
+    body.dark-mode .progress {
+      background-color: #444;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1002;
+      background-color: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    body.dark-mode .theme-toggle {
+      background-color: #2d2d2d;
+      border-color: #444;
+    }
+    
     @media (max-width: 767.98px) {
       .sidebar {
         position: fixed;
@@ -71,6 +150,11 @@
 </head>
 <body>
   <div class="container-fluid">
+    <!-- Theme toggle button -->
+    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+      <span id="theme-icon">🌙</span>
+    </button>
+    
     <div class="row">
       <!-- Mobile sidebar toggle -->
       <button class="btn btn-dark d-md-none sidebar-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,8 +180,8 @@
             <li class="nav-item"><a class="nav-link" href="#summary" data-module="summary">🎓 Summary</a></li>
           </ul>
           <hr class="my-3 bg-secondary">
-          <div class="text-center text-muted small py-2">
-            <a href="reset.html" class="text-muted">Reset Progress</a>
+          <div class="text-center py-2">
+            <button class="btn btn-sm btn-danger" id="reset-progress-btn">🔄 Reset Progress</button>
           </div>
         </div>
       </nav>
@@ -176,6 +260,36 @@
 
   <!-- Local App Script -->
   <script src="app.js"></script>
+  
+  <!-- Theme toggle script -->
+  <script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const body = document.body;
+    
+    // Check for saved theme preference or default to light mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    if (currentTheme === 'dark') {
+      body.classList.add('dark-mode');
+      themeIcon.textContent = '☀️';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      const isDarkMode = body.classList.contains('dark-mode');
+      themeIcon.textContent = isDarkMode ? '☀️' : '🌙';
+      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    });
+    
+    // Reset progress functionality
+    document.getElementById('reset-progress-btn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to reset your progress? This action cannot be undone.')) {
+        localStorage.removeItem('dbTraining_completedModules');
+        location.reload(); // Reload the page to reset everything
+      }
+    });
+  </script>
 </body>
 </html>
 
