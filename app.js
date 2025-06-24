@@ -184,6 +184,12 @@ function setupEventListeners() {
 
 async function loadModule(moduleName) {
   try {
+    // Default to welcome if moduleName is null or undefined
+    if (!moduleName) {
+      moduleName = "welcome";
+      console.log("No module specified, defaulting to welcome");
+    }
+    
     currentModule = moduleName;
 
     document.querySelectorAll("#sidebar-menu .nav-link").forEach((link) =>

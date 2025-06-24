@@ -47,12 +47,15 @@
         <p>Click the button below to reset your progress in the database training module.</p>
         <button id="resetBtn">Reset My Progress</button>
         <p id="success" class="success">Your progress has been reset successfully!</p>
-        <a href="index.html">Return to Training</a>
+        <a href="index.html" id="returnLink">Return to Training</a>
     </div>
 
     <script>
         document.getElementById('resetBtn').addEventListener('click', function() {
+            // Clear all localStorage items related to the training
             localStorage.removeItem('dbTraining_completedModules');
+            
+            // Show success message
             document.getElementById('success').style.display = 'block';
             this.disabled = true;
         });
