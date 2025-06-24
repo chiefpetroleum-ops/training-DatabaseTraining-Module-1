@@ -142,8 +142,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 function setupEventListeners() {
-  // Only add click handlers to module links, not the reset link
-  document.querySelectorAll("#sidebar-menu .nav-link[data-module]").forEach((link) => {
+  document.querySelectorAll("#sidebar-menu .nav-link").forEach((link) => {
     link.addEventListener("click", function (e) {
       e.preventDefault();
       const module = this.getAttribute("data-module");
@@ -177,12 +176,6 @@ function setupEventListeners() {
 
 async function loadModule(moduleName) {
   try {
-    // Default to welcome if moduleName is null or undefined
-    if (!moduleName) {
-      moduleName = "welcome";
-      console.log("No module specified, defaulting to welcome");
-    }
-    
     currentModule = moduleName;
 
     document.querySelectorAll("#sidebar-menu .nav-link").forEach((link) =>
@@ -224,24 +217,13 @@ async function loadModule(moduleName) {
       }
     }
 
-    // First check if SQL playground should be shown
+    document.getElementById("module-content").innerHTML = content;
+
     const showSql = ["sql-basics", "joins", "exercises", "project"].includes(moduleName);
     const sqlPlayground = document.getElementById("sql-playground");
     if (sqlPlayground) {
       sqlPlayground.classList.toggle("d-none", !showSql);
-      
-      // Move SQL playground to top of content area when visible
-      if (showSql) {
-        const contentArea = document.getElementById("content-area");
-        const moduleContent = document.getElementById("module-content");
-        if (contentArea && moduleContent) {
-          contentArea.insertBefore(sqlPlayground, moduleContent);
-        }
-      }
     }
-
-    // Then load the module content
-    document.getElementById("module-content").innerHTML = content;
 
     document.querySelectorAll("pre code").forEach((block) => {
       if (window.hljs) {
@@ -466,4 +448,3 @@ function resetDatabase() {
     `;
   }
 }
-

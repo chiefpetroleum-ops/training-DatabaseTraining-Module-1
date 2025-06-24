@@ -1,0 +1,554 @@
+<div class="module-section">
+    <div class="alert alert-info">
+        <h4>SQL Joins & Relationships</h4>
+        <p>In this module, we'll learn how to use SQL joins to combine data from multiple tables, one of the most powerful features of relational databases.</p>
+    </div>
+
+    <h3>Understanding Table Relationships</h3>
+    <p>The real power of relational databases comes from the ability to establish relationships between tables and then use these relationships to query data across tables.</p>
+    
+    <div class="row">
+        <div class="col-lg-7">
+            <p>In our petroleum sales database, we have the following relationships:</p>
+            <ul>
+                <li><strong>Customers ↔ Sales:</strong> One customer can have many sales</li>
+                <li><strong>Products ↔ Sales:</strong> One product can be in many sales</li>
+                <li><strong>Sales ↔ Deliveries:</strong> One sale can have one delivery</li>
+                <li><strong>Drivers ↔ Deliveries:</strong> One driver can make many deliveries</li>
+            </ul>
+            <p>These relationships are implemented using foreign keys, which are columns in one table that reference the primary key of another table.</p>
+            <p>For example, the <code>customer_id</code> column in the <code>sales</code> table is a foreign key that references the <code>customer_id</code> primary key in the <code>customers</code> table.</p>
+        </div>
+        <div class="col-lg-5">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">Types of Relationships</h5>
+                    <ul>
+                        <li><strong>One-to-One:</strong> Each record in Table A is related to exactly one record in Table B</li>
+                        <li><strong>One-to-Many:</strong> Each record in Table A can be related to multiple records in Table B</li>
+                        <li><strong>Many-to-Many:</strong> Multiple records in Table A can be related to multiple records in Table B (requires a junction table)</li>
+                    </ul>
+                    <p>Most relationships in our database are one-to-many.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mt-4">What are SQL Joins?</h3>
+    <p>SQL joins allow you to combine rows from two or more tables based on a related column between them. Joins are used to retrieve data that spans multiple tables in a single query.</p>
+    
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    Why Use Joins?
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li><strong>Avoid Redundancy:</strong> Store data in separate tables to minimize duplication</li>
+                        <li><strong>Maintain Data Integrity:</strong> Update data in one place</li>
+                        <li><strong>Combine Related Data:</strong> Pull information from different tables in a single query</li>
+                        <li><strong>Create Comprehensive Reports:</strong> Generate reports that include data from multiple sources</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    Join Syntax
+                </div>
+                <div class="card-body">
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT columns
+FROM table1
+JOIN_TYPE table2
+ON table1.column = table2.column;</code></pre>
+                    </div>
+                    <p class="mt-3">Where <code>JOIN_TYPE</code> can be:</p>
+                    <ul>
+                        <li><code>INNER JOIN</code> (or just <code>JOIN</code>)</li>
+                        <li><code>LEFT JOIN</code> (or <code>LEFT OUTER JOIN</code>)</li>
+                        <li><code>RIGHT JOIN</code> (not in SQLite)</li>
+                        <li><code>FULL JOIN</code> (not in SQLite)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Types of Joins</h3>
+    <p>There are several types of joins in SQL, each with different behaviors regarding how rows are matched between tables.</p>
+    
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">INNER JOIN</h5>
+                </div>
+                <div class="card-body">
+                    <p>Returns only the rows where there is a match in both tables.</p>
+                    <div class="text-center mb-3">
+                        <img src="images/inner-join.png" alt="Inner Join Diagram" class="img-fluid" style="max-width: 250px;" onerror="this.src='https://via.placeholder.com/250x150?text=Inner+Join'">
+                    </div>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT c.customer_name, s.sale_date, s.total_amount
+FROM customers c
+INNER JOIN sales s ON c.customer_id = s.customer_id;</code></pre>
+                    </div>
+                    <p class="mt-3">This returns sales data with customer names, but only for customers who have made at least one purchase.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">LEFT JOIN (LEFT OUTER JOIN)</h5>
+                </div>
+                <div class="card-body">
+                    <p>Returns all rows from the left table and matching rows from the right table. If no match, NULL values are returned for right table columns.</p>
+                    <div class="text-center mb-3">
+                        <img src="images/left-join.png" alt="Left Join Diagram" class="img-fluid" style="max-width: 250px;" onerror="this.src='https://via.placeholder.com/250x150?text=Left+Join'">
+                    </div>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT c.customer_name, s.sale_date, s.total_amount
+FROM customers c
+LEFT JOIN sales s ON c.customer_id = s.customer_id;</code></pre>
+                    </div>
+                    <p class="mt-3">This returns all customers, even those who haven't made any purchases (with NULL for sale data).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="alert alert-warning">
+        <h5>Note on RIGHT JOIN and FULL JOIN</h5>
+        <p>SQLite does not directly support RIGHT JOIN or FULL JOIN, but you can:</p>
+        <ul>
+            <li>Simulate a RIGHT JOIN by swapping the table order in a LEFT JOIN</li>
+            <li>Simulate a FULL JOIN using UNION of a LEFT JOIN and a RIGHT JOIN equivalent</li>
+        </ul>
+        <div class="code-block">
+            <pre><code class="language-sql">-- Simulate RIGHT JOIN
+SELECT c.customer_name, s.sale_date, s.total_amount
+FROM sales s
+LEFT JOIN customers c ON c.customer_id = s.customer_id;
+
+-- Simulate FULL JOIN
+SELECT c.customer_name, s.sale_date, s.total_amount
+FROM customers c
+LEFT JOIN sales s ON c.customer_id = s.customer_id
+UNION ALL
+SELECT c.customer_name, s.sale_date, s.total_amount
+FROM sales s
+LEFT JOIN customers c ON c.customer_id = s.customer_id
+WHERE c.customer_id IS NULL;</code></pre>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Join Examples with Our Database</h3>
+    <p>Let's explore some practical examples of joins using our petroleum sales database.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Basic Two-Table Join</h5>
+        </div>
+        <div class="card-body">
+            <p>Let's join the <code>sales</code> and <code>products</code> tables to see what products were sold in each transaction:</p>
+            <div class="code-block">
+                <pre><code class="language-sql">SELECT 
+  s.sale_id,
+  s.sale_date,
+  p.product_name,
+  p.category,
+  s.quantity,
+  s.total_amount
+FROM 
+  sales s
+JOIN 
+  products p ON s.product_id = p.product_id
+ORDER BY 
+  s.sale_date;</code></pre>
+            </div>
+            <p class="mt-3">This query joins the sales and products tables using the product_id column. For each sale, it shows the product name and category.</p>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Multiple Table Join</h5>
+        </div>
+        <div class="card-body">
+            <p>Now let's join three tables to see which customers bought which products:</p>
+            <div class="code-block">
+                <pre><code class="language-sql">SELECT 
+  s.sale_id,
+  s.sale_date,
+  c.customer_name,
+  c.city,
+  p.product_name,
+  p.category,
+  s.quantity,
+  s.total_amount
+FROM 
+  sales s
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+ORDER BY 
+  s.sale_date;</code></pre>
+            </div>
+            <p class="mt-3">This query joins three tables: sales, customers, and products. It shows detailed information about each sale, including customer and product details.</p>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">LEFT JOIN Example</h5>
+        </div>
+        <div class="card-body">
+            <p>Let's find all customers and see if they've made any purchases:</p>
+            <div class="code-block">
+                <pre><code class="language-sql">SELECT 
+  c.customer_id,
+  c.customer_name,
+  c.city,
+  COUNT(s.sale_id) AS number_of_purchases,
+  COALESCE(SUM(s.total_amount), 0) AS total_spent
+FROM 
+  customers c
+LEFT JOIN 
+  sales s ON c.customer_id = s.customer_id
+GROUP BY 
+  c.customer_id
+ORDER BY 
+  total_spent DESC;</code></pre>
+            </div>
+            <p class="mt-3">This query uses a LEFT JOIN to include all customers, even those who haven't made any purchases. The COALESCE function is used to convert NULL values to 0 for the total_spent column.</p>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Advanced Join Techniques</h3>
+    
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white">
+                    Using Aliases
+                </div>
+                <div class="card-body">
+                    <p>Table aliases make queries more readable, especially with multiple joins:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  c.customer_name,
+  p.product_name,
+  s.quantity,
+  d.delivery_date,
+  dr.driver_name
+FROM 
+  sales s
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+LEFT JOIN 
+  deliveries d ON s.sale_id = d.sale_id
+LEFT JOIN 
+  drivers dr ON d.driver_id = dr.driver_id;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white">
+                    Joining with Conditions
+                </div>
+                <div class="card-body">
+                    <p>You can add additional conditions to your joins:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  c.customer_name,
+  p.product_name,
+  s.quantity,
+  s.total_amount
+FROM 
+  sales s
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+WHERE 
+  p.category = 'Fuel'
+  AND c.state = 'CO'
+  AND s.quantity > 300;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white">
+                    Self Joins
+                </div>
+                <div class="card-body">
+                    <p>A self join is a join of a table to itself. It's useful for hierarchical or comparative data:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">-- Compare products in the same category
+SELECT 
+  p1.product_name AS product1,
+  p2.product_name AS product2,
+  p1.unit_price AS price1,
+  p2.unit_price AS price2,
+  (p1.unit_price - p2.unit_price) AS price_difference
+FROM 
+  products p1
+JOIN 
+  products p2 ON p1.category = p2.category
+WHERE 
+  p1.product_id < p2.product_id
+ORDER BY 
+  p1.category, price_difference DESC;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white">
+                    Subqueries in Joins
+                </div>
+                <div class="card-body">
+                    <p>You can use subqueries within joins for more complex logic:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">-- Find customers who made above-average purchases
+SELECT 
+  c.customer_name,
+  s.sale_id,
+  s.total_amount
+FROM 
+  customers c
+JOIN 
+  sales s ON c.customer_id = s.customer_id
+WHERE 
+  s.total_amount > (
+    SELECT AVG(total_amount) FROM sales
+  )
+ORDER BY 
+  s.total_amount DESC;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Practical Business Reports Using Joins</h3>
+    <p>Let's use joins to create some practical business reports for our petroleum sales company.</p>
+    
+    <div class="accordion mb-4" id="businessReports">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingReport1">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReport1" aria-expanded="true" aria-controls="collapseReport1">
+                    Customer Purchase Summary
+                </button>
+            </h2>
+            <div id="collapseReport1" class="accordion-collapse collapse show" aria-labelledby="headingReport1" data-bs-parent="#businessReports">
+                <div class="accordion-body">
+                    <p>This report summarizes purchase activity by customer, including total spent, number of orders, and most recent purchase:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  c.customer_name,
+  c.city,
+  c.state,
+  COUNT(s.sale_id) AS order_count,
+  SUM(s.quantity) AS total_quantity,
+  SUM(s.total_amount) AS total_spent,
+  ROUND(AVG(s.total_amount), 2) AS average_order,
+  MAX(s.sale_date) AS most_recent_order
+FROM 
+  customers c
+LEFT JOIN 
+  sales s ON c.customer_id = s.customer_id
+GROUP BY 
+  c.customer_id
+ORDER BY 
+  total_spent DESC;</code></pre>
+                    </div>
+                    <p class="mt-3">This report helps identify your most valuable customers and those who might need more attention.</p>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingReport2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReport2" aria-expanded="false" aria-controls="collapseReport2">
+                    Product Performance Analysis
+                </button>
+            </h2>
+            <div id="collapseReport2" class="accordion-collapse collapse" aria-labelledby="headingReport2" data-bs-parent="#businessReports">
+                <div class="accordion-body">
+                    <p>This report analyzes the performance of each product, including sales volume, revenue, and profitability:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  p.product_name,
+  p.category,
+  COUNT(s.sale_id) AS times_sold,
+  SUM(s.quantity) AS total_quantity,
+  ROUND(SUM(s.total_amount), 2) AS total_revenue,
+  ROUND(SUM(s.profit), 2) AS total_profit,
+  ROUND(AVG(s.profit / s.total_amount) * 100, 2) AS avg_profit_margin
+FROM 
+  products p
+LEFT JOIN 
+  sales s ON p.product_id = s.product_id
+GROUP BY 
+  p.product_id
+ORDER BY 
+  total_profit DESC;</code></pre>
+                    </div>
+                    <p class="mt-3">This report helps identify your most profitable products and those that might need pricing adjustments.</p>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingReport3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReport3" aria-expanded="false" aria-controls="collapseReport3">
+                    Delivery Performance by Driver
+                </button>
+            </h2>
+            <div id="collapseReport3" class="accordion-collapse collapse" aria-labelledby="headingReport3" data-bs-parent="#businessReports">
+                <div class="accordion-body">
+                    <p>This report evaluates the performance of each driver based on delivery metrics:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  dr.driver_name,
+  dr.status,
+  COUNT(d.delivery_id) AS delivery_count,
+  SUM(s.quantity) AS total_quantity_delivered,
+  ROUND(SUM(s.total_amount), 2) AS total_value_delivered,
+  ROUND(AVG(julianday(d.delivery_date) - julianday(s.sale_date)), 1) AS avg_delivery_days
+FROM 
+  drivers dr
+LEFT JOIN 
+  deliveries d ON dr.driver_id = d.driver_id
+LEFT JOIN 
+  sales s ON d.sale_id = s.sale_id
+GROUP BY 
+  dr.driver_id
+ORDER BY 
+  delivery_count DESC;</code></pre>
+                    </div>
+                    <p class="mt-3">This report helps identify your most productive drivers and those who might need additional training or support.</p>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingReport4">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReport4" aria-expanded="false" aria-controls="collapseReport4">
+                    Sales by Geographic Region
+                </button>
+            </h2>
+            <div id="collapseReport4" class="accordion-collapse collapse" aria-labelledby="headingReport4" data-bs-parent="#businessReports">
+                <div class="accordion-body">
+                    <p>This report analyzes sales performance by geographic region:</p>
+                    <div class="code-block">
+                        <pre><code class="language-sql">SELECT 
+  c.state,
+  c.city,
+  COUNT(DISTINCT c.customer_id) AS customer_count,
+  COUNT(s.sale_id) AS sale_count,
+  ROUND(SUM(s.total_amount), 2) AS total_revenue,
+  ROUND(SUM(s.profit), 2) AS total_profit,
+  ROUND(AVG(s.profit / s.total_amount) * 100, 2) AS avg_profit_margin
+FROM 
+  customers c
+LEFT JOIN 
+  sales s ON c.customer_id = s.customer_id
+GROUP BY 
+  c.state, c.city
+ORDER BY 
+  total_revenue DESC;</code></pre>
+                    </div>
+                    <p class="mt-3">This report helps identify high-performing regions and areas for potential expansion.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Creating Views with Joins</h3>
+    <p>SQL views allow you to save complex queries, including those with joins, as virtual tables that can be queried like regular tables.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Creating a View</h5>
+        </div>
+        <div class="card-body">
+            <p>Let's create a comprehensive sales report view that joins multiple tables:</p>
+            <div class="code-block">
+                <pre><code class="language-sql">CREATE VIEW sales_report AS
+SELECT 
+  s.sale_id,
+  s.sale_date,
+  c.customer_id,
+  c.customer_name,
+  c.city,
+  c.state,
+  p.product_id,
+  p.product_name,
+  p.category,
+  s.quantity,
+  s.total_amount,
+  s.cost,
+  s.profit,
+  ROUND((s.profit / s.total_amount) * 100, 2) AS profit_margin_percent,
+  d.delivery_id,
+  d.delivery_date,
+  d.status AS delivery_status,
+  dr.driver_id,
+  dr.driver_name
+FROM 
+  sales s
+JOIN 
+  customers c ON s.customer_id = c.customer_id
+JOIN 
+  products p ON s.product_id = p.product_id
+LEFT JOIN 
+  deliveries d ON s.sale_id = d.sale_id
+LEFT JOIN 
+  drivers dr ON d.driver_id = dr.driver_id;</code></pre>
+            </div>
+            <p class="mt-3">Once created, you can query this view like a regular table:</p>
+            <div class="code-block">
+                <pre><code class="language-sql">-- Query the view
+SELECT * FROM sales_report;
+
+-- Filter and aggregate using the view
+SELECT 
+  product_name,
+  SUM(quantity) AS total_quantity,
+  SUM(total_amount) AS total_revenue,
+  AVG(profit_margin_percent) AS avg_margin
+FROM 
+  sales_report
+GROUP BY 
+  product_id
+ORDER BY 
+  total_revenue DESC;</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-success">
+        <h5>Benefits of Views</h5>
+        <ul>
+            <li><strong>Simplify Complex Queries:</strong> Encapsulate complex joins and logic in a view</li>
+            <li><strong>Consistency:</strong> Ensure everyone uses the same join logic and calculations</li>
+            <li><strong>Security:</strong> Grant access to views instead of underlying tables</li>
+            <li><strong>Abstraction:</strong> Hide the complexity of the database schema</li>
+        </ul>
+    </div>
+
+    <div class="text-center mt-5">
+        <button id="complete-module-btn" class="btn btn-primary btn-lg px-4">Mark as Complete</button>
+    </div>
+</div>
