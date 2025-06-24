@@ -88,6 +88,26 @@
 - [ ] **FUTURE**: Predictive modeling foundations
 - [ ] **FUTURE**: KPI dashboard development
 
+## Phase 6: Real-World Data Integration ⚡ (NEW)
+
+### 6.1 QuickBooks CSV Import Feature
+- [ ] **PRIORITY**: Create custom CSV upload interface for QuickBooks exports
+- [ ] **PRIORITY**: Develop data cleaning and transformation pipeline for QuickBooks data
+- [ ] **PRIORITY**: Build schema mapping tool to match QuickBooks fields to database tables
+- [ ] **PRIORITY**: Add real-time visualization of imported data structure
+
+### 6.2 Interactive Database Builder
+- [ ] **PRIORITY**: Create visual interface for database table creation
+- [ ] **PRIORITY**: Implement real-time visualization of database schema changes
+- [ ] **PRIORITY**: Add drag-and-drop field creation and relationship mapping
+- [ ] **PRIORITY**: Develop export functionality for created database schemas
+
+### 6.3 Data Visualization Components
+- [ ] **PRIORITY**: Add real-time data preview during import process
+- [ ] **PRIORITY**: Create dynamic charts and graphs for imported data
+- [ ] **PRIORITY**: Implement interactive query result visualization
+- [ ] **PRIORITY**: Build custom dashboard for monitoring database changes
+
 ## Implementation Details
 
 ### Current Sprint (Week 1-2)
@@ -123,6 +143,22 @@
    - Module 4: Data Integration Patterns
    - Module 5: Business Intelligence Foundations
 
+### New Sprint (Week 5-6)
+**Focus**: QuickBooks Integration and Real-World Data Features
+
+#### Planned Development
+1. **QuickBooks CSV Import Feature**
+   - File upload component for data-import.html page
+   - CSV parsing and cleaning JavaScript module
+   - Field mapping interface for QuickBooks data
+   - Real-time data preview component
+
+2. **Interactive Database Builder**
+   - Visual schema designer interface
+   - Real-time SQL generation from visual schema
+   - Table relationship visualization
+   - Schema export and documentation generation
+
 ### Technical Implementation Notes
 
 #### Code Quality Standards
@@ -149,11 +185,13 @@
 - **PowerShell Execution Policy**: Documented workarounds and admin instructions
 - **Python Version Conflicts**: Version verification and installation guidance
 - **SQLite Compatibility**: Portable binaries eliminate installation issues
+- **QuickBooks CSV Format Variations**: Implement flexible parsing with format detection
 
 ### User Experience Risks
 - **Setup Complexity**: Automated scripts reduce manual configuration
 - **Learning Curve**: Progressive complexity with business context
 - **Support Requirements**: Comprehensive documentation and troubleshooting guides
+- **Data Privacy Concerns**: Clear documentation on local-only processing of QuickBooks data
 
 ## Success Metrics
 
@@ -162,6 +200,12 @@
 - [ ] Advanced query exercises functional
 - [ ] User feedback score > 4.0/5.0
 - [ ] Setup success rate maintains > 95%
+
+### Phase 6 Targets
+- [ ] Successful QuickBooks CSV import rate > 90%
+- [ ] User satisfaction with data visualization > 4.2/5.0
+- [ ] Database schema creation completion rate > 85%
+- [ ] Time savings vs. manual data entry > 75%
 
 ### Long-term Goals
 - [ ] Complete 5-module course curriculum
@@ -175,6 +219,7 @@
 - **Module 2**: 8-10 hours (documentation and examples)
 - **Module 3**: 12-15 hours (advanced SQL concepts)
 - **Module 4**: 15-20 hours (integration and automation)
+- **QuickBooks Integration**: 18-24 hours (upload, mapping, visualization)
 - **Testing and refinement**: 6-8 hours per module
 
 ### Tools and Dependencies
@@ -182,6 +227,7 @@
 - **Testing**: Clean Windows 11 environment, multiple user personas
 - **Documentation**: Microsoft Office for reference materials
 - **Version Control**: Git for code and documentation management
+- **New Requirements**: JavaScript libraries for CSV parsing and data visualization
 
 ---
 
