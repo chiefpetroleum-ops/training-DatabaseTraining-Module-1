@@ -1,130 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interactive SQLite database training with SQL playground" />
+  <meta name="keywords" content="SQLite, SQL, training, petroleum, database" />
+  <meta name="author" content="True North Data Strategies" />
   <title>Interactive Database Training</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💾</text></svg>">
+
+  <!-- External CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" rel="stylesheet">
+
+  <!-- Local stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Additional sidebar fix styles -->
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
-      background-color: #f8f9fa;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #0d6efd;
-    }
-    .loading {
-      margin: 20px 0;
-    }
-    .spinner {
-      display: inline-block;
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(0,0,0,0.1);
-      border-radius: 50%;
-      border-top-color: #0d6efd;
-      animation: spin 1s ease-in-out infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .btn {
-      display: inline-block;
-      background-color: #0d6efd;
-      color: white;
-      text-decoration: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      margin-top: 20px;
-      font-weight: bold;
-    }
-    .btn-outline {
-      background-color: transparent;
-      color: #0d6efd;
-      border: 1px solid #0d6efd;
-      margin-left: 10px;
-    }
-    .btn:hover {
-      opacity: 0.9;
+    @media (max-width: 767.98px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      
+      .sidebar-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1001;
+      }
+      
+      main {
+        margin-left: 0 !important;
+        padding-top: 60px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Interactive Database Training</h1>
-    <p>Welcome to the SQLite Database Training Module</p>
-    
-    <p>Click below to start the training or reset your progress:</p>
-    
-    <div>
-      <a href="welcome.html" class="btn">Start Training</a>
-      <a href="reset.html" class="btn btn-outline">Reset Progress</a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Mobile sidebar toggle -->
+      <button class="btn btn-dark d-md-none sidebar-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span>☰</span> Menu
+      </button>
+      
+      <!-- Sidebar -->
+      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+        <div class="position-sticky pt-3">
+          <div class="logo-container text-center mb-4">
+            <img src="images/tn-logo.svg" alt="True North Logo" class="tn-logo mb-2">
+            <h3 class="text-white">Database Training</h3>
+            <p class="text-muted">Module 1: SQLite Fundamentals</p>
+          </div>
+          <ul class="nav flex-column" id="sidebar-menu">
+            <li class="nav-item"><a class="nav-link active" href="#welcome" data-module="welcome">📚 Welcome</a></li>
+            <li class="nav-item"><a class="nav-link" href="#concepts" data-module="concepts">💡 Database Concepts</a></li>
+            <li class="nav-item"><a class="nav-link" href="#setup" data-module="setup">🛠️ Environment Setup</a></li>
+            <li class="nav-item"><a class="nav-link" href="#data-import" data-module="data-import">📊 Data Import & Cleaning</a></li>
+            <li class="nav-item"><a class="nav-link" href="#sql-basics" data-module="sql-basics">📝 SQL Basics</a></li>
+            <li class="nav-item"><a class="nav-link" href="#joins" data-module="joins">🔗 Joins & Relationships</a></li>
+            <li class="nav-item"><a class="nav-link" href="#exercises" data-module="exercises">🏋️ Practice Exercises</a></li>
+            <li class="nav-item"><a class="nav-link" href="#project" data-module="project">🚚 Delivery Tracking Project</a></li>
+            <li class="nav-item"><a class="nav-link" href="#summary" data-module="summary">🎓 Summary</a></li>
+          </ul>
+          <hr class="my-3 bg-secondary">
+          <div class="text-center text-muted small py-2">
+            <a href="reset.html" class="text-muted">Reset Progress</a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main content -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2" id="page-title">Welcome to Database Training</h1>
+          <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+              <button type="button" id="prev-btn" class="btn btn-sm btn-outline-secondary">Previous</button>
+              <button type="button" id="next-btn" class="btn btn-sm btn-outline-primary">Next</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic module content -->
+        <div id="module-content"></div>
+
+        <!-- SQL Playground -->
+        <div id="sql-playground" class="mt-4 d-none">
+          <div class="card">
+            <div class="card-header bg-dark text-white">
+              <h5 class="mb-0">SQL Playground</h5>
+            </div>
+            <div class="card-body">
+              <div class="form-group mb-3">
+                <label for="sql-query">Enter SQL Query:</label>
+                <textarea id="sql-query" class="form-control code-editor" rows="4"></textarea>
+              </div>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <button id="run-sql" class="btn btn-primary">Run Query</button>
+                  <button id="clear-results" class="btn btn-secondary ms-2">Clear Results</button>
+                </div>
+                <button id="reset-db" class="btn btn-outline-danger">Reset Database</button>
+              </div>
+              <div id="sql-results" class="mt-3 sql-results">
+                <div class="alert alert-info">
+                  Enter a SQL query and click "Run Query" to see results.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="progress-container mt-5 mb-3">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Progress:</span>
+            <span class="text-muted" id="progress-text">0/9 completed</span>
+          </div>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+          </div>
+        </div>
+      </main>
     </div>
-    
-    <p style="margin-top: 30px; font-size: 0.9em; color: #6c757d;">
-      Module 1: SQLite Fundamentals<br>
-      True North Data Strategies
-    </p>
   </div>
-  
-  <script>
-    // Check if localStorage exists
-    if (localStorage.getItem("dbTraining_completedModules")) {
-      const completedModules = JSON.parse(localStorage.getItem("dbTraining_completedModules"));
-      if (completedModules && completedModules.length > 0) {
-        document.querySelector(".container").insertAdjacentHTML("beforeend", 
-          "<p style='margin-top: 20px; color: #28a745;'>You have progress saved. Click 'Start Training' to continue where you left off.</p>"
-        );
-      }
-    }
-  </script>
-<script>
-// Add reset button
-document.addEventListener("DOMContentLoaded", function() {
-  const resetLink = document.createElement("a");
-  resetLink.textContent = "Reset Progress";
-  resetLink.href = "reset-progress.html";
-  resetLink.style.position = "fixed";
-  resetLink.style.bottom = "20px";
-  resetLink.style.right = "20px";
-  resetLink.style.padding = "10px 15px";
-  resetLink.style.backgroundColor = "#dc3545";
-  resetLink.style.color = "white";
-  resetLink.style.textDecoration = "none";
-  resetLink.style.borderRadius = "4px";
-  resetLink.style.zIndex = "9999";
-  resetLink.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
-  document.body.appendChild(resetLink);
-});
-</script>
-<script>
-// Add reset button
-document.addEventListener('DOMContentLoaded', function() {
-  const resetLink = document.createElement('a');
-  resetLink.textContent = 'Reset Progress';
-  resetLink.href = 'reset-progress.html';
-  resetLink.style.position = 'fixed';
-  resetLink.style.bottom = '20px';
-  resetLink.style.right = '20px';
-  resetLink.style.padding = '10px 15px';
-  resetLink.style.backgroundColor = '#dc3545';
-  resetLink.style.color = 'white';
-  resetLink.style.textDecoration = 'none';
-  resetLink.style.borderRadius = '4px';
-  resetLink.style.zIndex = '9999';
-  resetLink.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-  document.body.appendChild(resetLink);
-});
-</script>
+
+  <!-- External JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+
+  <!-- Local App Script -->
+  <script src="app.js"></script>
 </body>
 </html>
 
