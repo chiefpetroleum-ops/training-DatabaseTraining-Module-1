@@ -322,3 +322,183 @@ main {
     color: #e6edf3 !important;
     border-color: #2d8659 !important;
 }
+
+/* Enhanced Dark Mode Styles for Better Readability */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+/* Improve card readability in dark mode */
+body.dark-mode .card {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+body.dark-mode .card-body {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+body.dark-mode .card-title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .card-text {
+    color: #e0e0e0;
+}
+
+/* Improve alert readability in dark mode */
+body.dark-mode .alert {
+    border: 1px solid #444;
+}
+
+body.dark-mode .alert-primary {
+    background-color: #2a4764;
+    color: #e0e0e0;
+    border-color: #3a6ea5;
+}
+
+/* Improve text colors in dark mode */
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4, 
+body.dark-mode h5, 
+body.dark-mode h6,
+body.dark-mode p,
+body.dark-mode li,
+body.dark-mode label {
+    color: #e0e0e0;
+}
+
+/* Improve tables in dark mode */
+body.dark-mode table {
+    color: #e0e0e0;
+    border-color: #444;
+}
+
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #333333;
+}
+
+body.dark-mode .table-striped tbody tr:nth-of-type(even) {
+    background-color: #2d2d2d;
+}
+
+body.dark-mode .table-bordered,
+body.dark-mode .table-bordered td,
+body.dark-mode .table-bordered th {
+    border-color: #444;
+}
+
+body.dark-mode .table-dark {
+    background-color: #222;
+}
+
+/* Improve code blocks in dark mode */
+body.dark-mode .code-block {
+    background-color: #222;
+    border-color: #444;
+}
+
+/* Improve form controls in dark mode */
+body.dark-mode .form-control {
+    background-color: #333;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+body.dark-mode .form-control:focus {
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+}
+
+/* Improve buttons in dark mode */
+body.dark-mode .btn-outline-secondary {
+    color: #e0e0e0;
+    border-color: #6c757d;
+}
+
+body.dark-mode .btn-outline-primary {
+    color: #6ea8fe;
+    border-color: #6ea8fe;
+}
+
+/* Fix display numbers in dark mode */
+body.dark-mode .display-4.text-primary {
+    color: #6ea8fe !important;
+}
+
+/* Improve step guides in dark mode */
+body.dark-mode .step-guide .step:before {
+    background-color: #3a6ea5;
+}
+
+/* Improve progress bar in dark mode */
+body.dark-mode .progress {
+    background-color: #444;
+}
+
+/* Improve module section in dark mode */
+body.dark-mode .module-section h3 {
+    color: #e0e0e0;
+}
+
+/* Improve info boxes in dark mode */
+body.dark-mode .info-box {
+    background-color: #2a4764;
+    border-color: #3a6ea5;
+    color: #e0e0e0;
+}
+
+body.dark-mode .warning-box {
+    background-color: #695324;
+    border-color: #b3851d;
+    color: #e0e0e0;
+}
+
+body.dark-mode .success-box {
+    background-color: #1e4835;
+    border-color: #2d8659;
+    color: #e0e0e0;
+}
+
+/* Improve database table diagrams in dark mode */
+body.dark-mode .db-table {
+    border-color: #444;
+}
+
+body.dark-mode .db-table .table-body {
+    background-color: #2d2d2d;
+}
+
+/* Improve accordion in dark mode */
+body.dark-mode .accordion-item {
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+
+body.dark-mode .accordion-button {
+    background-color: #333;
+    color: #e0e0e0;
+}
+
+body.dark-mode .accordion-button:not(.collapsed) {
+    background-color: #3a6ea5;
+    color: #fff;
+}
+
+body.dark-mode .accordion-button::after {
+    filter: invert(1);
+}
+
+/* Improve borders in dark mode */
+body.dark-mode .border,
+body.dark-mode .border-top,
+body.dark-mode .border-bottom,
+body.dark-mode .border-start,
+body.dark-mode .border-end {
+    border-color: #444 !important;
+}
