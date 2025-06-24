@@ -37,11 +37,13 @@
     
     body.dark-mode main {
       background-color: #1a1a1a;
+      color: #e0e0e0;
     }
     
     body.dark-mode .card {
       background-color: #2d2d2d;
       border-color: #444;
+      color: #e0e0e0;
     }
     
     body.dark-mode .card-header {
@@ -85,6 +87,32 @@
       background-color: #444;
     }
     
+    /* Fix text colors in dark mode */
+    body.dark-mode #module-content,
+    body.dark-mode #module-content p,
+    body.dark-mode #module-content h1,
+    body.dark-mode #module-content h2,
+    body.dark-mode #module-content h3,
+    body.dark-mode #module-content h4,
+    body.dark-mode #module-content h5,
+    body.dark-mode #module-content h6,
+    body.dark-mode #module-content li,
+    body.dark-mode #module-content span,
+    body.dark-mode #module-content div,
+    body.dark-mode .text-muted {
+      color: #e0e0e0 !important;
+    }
+    
+    body.dark-mode .btn-outline-secondary {
+      color: #e0e0e0;
+      border-color: #6c757d;
+    }
+    
+    body.dark-mode .btn-outline-primary {
+      color: #6ea8fe;
+      border-color: #6ea8fe;
+    }
+    
     /* Invert logo colors in dark mode */
     body.dark-mode .header-logo,
     body.dark-mode .sidebar-logo,
@@ -94,20 +122,18 @@
     
     /* Theme toggle button */
     .theme-toggle {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1002;
       background-color: #fff;
       border: 1px solid #dee2e6;
       border-radius: 50%;
       width: 40px;
       height: 40px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.3s ease;
+      margin-left: 15px;
+      vertical-align: middle;
     }
     
     body.dark-mode .theme-toggle {
@@ -172,11 +198,6 @@
 </head>
 <body>
   <div class="container-fluid">
-    <!-- Theme toggle button -->
-    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
-      <span id="theme-icon">🌙</span>
-    </button>
-    
     <div class="row">
       <!-- Mobile sidebar toggle -->
       <button class="btn btn-dark d-md-none sidebar-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -215,6 +236,10 @@
           <div class="d-flex align-items-center">
             <img src="images/tn-logo.svg" alt="True North Logo" class="header-logo">
             <h1 class="h2 mb-0" id="page-title">Welcome to Database Training</h1>
+            <!-- Theme toggle button -->
+            <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+              <span id="theme-icon">🌙</span>
+            </button>
           </div>
           <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group me-2">
