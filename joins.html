@@ -89,7 +89,7 @@ ON table1.column = table2.column;</code></pre>
                 <div class="card-body">
                     <p>Returns only the rows where there is a match in both tables.</p>
                     <div class="text-center mb-3">
-                        <img src="images/inner-join.png" alt="Inner Join Diagram" class="img-fluid" style="max-width: 250px;" onerror="this.src='https://via.placeholder.com/250x150?text=Inner+Join'">
+                        <img src="images/inner-join.svg" alt="Inner Join Diagram" class="img-fluid" style="max-width: 250px;">
                     </div>
                     <div class="code-block">
                         <pre><code class="language-sql">SELECT c.customer_name, s.sale_date, s.total_amount
@@ -108,7 +108,7 @@ INNER JOIN sales s ON c.customer_id = s.customer_id;</code></pre>
                 <div class="card-body">
                     <p>Returns all rows from the left table and matching rows from the right table. If no match, NULL values are returned for right table columns.</p>
                     <div class="text-center mb-3">
-                        <img src="images/left-join.png" alt="Left Join Diagram" class="img-fluid" style="max-width: 250px;" onerror="this.src='https://via.placeholder.com/250x150?text=Left+Join'">
+                        <img src="images/left-join.svg" alt="Left Join Diagram" class="img-fluid" style="max-width: 250px;">
                     </div>
                     <div class="code-block">
                         <pre><code class="language-sql">SELECT c.customer_name, s.sale_date, s.total_amount

@@ -1,0 +1,28 @@
+<svg width="250" height="150" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .circle { fill-opacity: 0.5; stroke: #333; stroke-width: 2; }
+    .circle-left { fill: #3498db; }
+    .circle-right { fill: #2ecc71; }
+    .intersection { fill: #9b59b6; fill-opacity: 0.7; }
+    .left-only { fill: #3498db; fill-opacity: 0.7; }
+    .label { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; }
+  </style>
+  
+  <!-- Circles -->
+  <circle class="circle circle-left" cx="100" cy="75" r="60" />
+  <circle class="circle circle-right" cx="150" cy="75" r="60" />
+  
+  <!-- Left side highlight (non-intersection) -->
+  <path class="left-only" d="M100,15 A60,60 0 0,1 100,135 A60,60 0 0,1 100,15" />
+  
+  <!-- Intersection highlight -->
+  <path class="intersection" d="M125,27 A60,60 0 0,0 125,123 A60,60 0 0,0 125,27" />
+  
+  <!-- Labels -->
+  <text class="label" x="70" y="75">Table A</text>
+  <text class="label" x="180" y="75">Table B</text>
+  <text class="label" x="125" y="75">LEFT JOIN</text>
+  
+  <!-- Title -->
+  <text class="label" x="125" y="20" font-weight="bold">LEFT JOIN</text>
+</svg> 

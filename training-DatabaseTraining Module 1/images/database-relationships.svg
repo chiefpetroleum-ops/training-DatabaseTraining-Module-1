@@ -1,0 +1,107 @@
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .table { fill: #f8f9fa; stroke: #333; stroke-width: 2; }
+    .table-header { fill: #343a40; }
+    .table-text { font-family: Arial, sans-serif; font-size: 12px; }
+    .header-text { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; fill: white; }
+    .pk { fill: #ffc107; }
+    .fk { fill: #17a2b8; }
+    .relation { stroke: #6c757d; stroke-width: 2; fill: none; }
+    .pk-marker { fill: #ffc107; }
+    .fk-marker { fill: #17a2b8; }
+  </style>
+  
+  <!-- Customers Table -->
+  <g transform="translate(50, 50)">
+    <rect class="table" width="180" height="140" rx="5" />
+    <rect class="table-header" width="180" height="30" rx="5" />
+    <text class="header-text" x="90" y="20" text-anchor="middle">customers</text>
+    
+    <!-- Fields -->
+    <text class="table-text" x="10" y="50"><tspan class="pk">🔑</tspan> CustomerID (PK)</text>
+    <text class="table-text" x="10" y="70">CustomerName</text>
+    <text class="table-text" x="10" y="90">ContactName</text>
+    <text class="table-text" x="10" y="110">City</text>
+    <text class="table-text" x="10" y="130">State</text>
+    <text class="table-text" x="10" y="150">Phone</text>
+  </g>
+  
+  <!-- Products Table -->
+  <g transform="translate(570, 50)">
+    <rect class="table" width="180" height="120" rx="5" />
+    <rect class="table-header" width="180" height="30" rx="5" />
+    <text class="header-text" x="90" y="20" text-anchor="middle">products</text>
+    
+    <!-- Fields -->
+    <text class="table-text" x="10" y="50"><tspan class="pk">🔑</tspan> ProductID (PK)</text>
+    <text class="table-text" x="10" y="70">ProductName</text>
+    <text class="table-text" x="10" y="90">Category</text>
+    <text class="table-text" x="10" y="110">UnitPrice</text>
+    <text class="table-text" x="10" y="130">UnitsInStock</text>
+  </g>
+  
+  <!-- Sales Table -->
+  <g transform="translate(310, 180)">
+    <rect class="table" width="180" height="140" rx="5" />
+    <rect class="table-header" width="180" height="30" rx="5" />
+    <text class="header-text" x="90" y="20" text-anchor="middle">sales</text>
+    
+    <!-- Fields -->
+    <text class="table-text" x="10" y="50"><tspan class="pk">🔑</tspan> SaleID (PK)</text>
+    <text class="table-text" x="10" y="70"><tspan class="fk">🔗</tspan> CustomerID (FK)</text>
+    <text class="table-text" x="10" y="90"><tspan class="fk">🔗</tspan> ProductID (FK)</text>
+    <text class="table-text" x="10" y="110">Quantity</text>
+    <text class="table-text" x="10" y="130">SaleDate</text>
+    <text class="table-text" x="10" y="150">TotalAmount</text>
+  </g>
+  
+  <!-- Drivers Table -->
+  <g transform="translate(50, 240)">
+    <rect class="table" width="180" height="100" rx="5" />
+    <rect class="table-header" width="180" height="30" rx="5" />
+    <text class="header-text" x="90" y="20" text-anchor="middle">drivers</text>
+    
+    <!-- Fields -->
+    <text class="table-text" x="10" y="50"><tspan class="pk">🔑</tspan> DriverID (PK)</text>
+    <text class="table-text" x="10" y="70">FirstName</text>
+    <text class="table-text" x="10" y="90">LastName</text>
+    <text class="table-text" x="10" y="110">LicenseNumber</text>
+  </g>
+  
+  <!-- Deliveries Table -->
+  <g transform="translate(570, 240)">
+    <rect class="table" width="180" height="120" rx="5" />
+    <rect class="table-header" width="180" height="30" rx="5" />
+    <text class="header-text" x="90" y="20" text-anchor="middle">deliveries</text>
+    
+    <!-- Fields -->
+    <text class="table-text" x="10" y="50"><tspan class="pk">🔑</tspan> DeliveryID (PK)</text>
+    <text class="table-text" x="10" y="70"><tspan class="fk">🔗</tspan> SaleID (FK)</text>
+    <text class="table-text" x="10" y="90"><tspan class="fk">🔗</tspan> DriverID (FK)</text>
+    <text class="table-text" x="10" y="110">DeliveryDate</text>
+    <text class="table-text" x="10" y="130">Status</text>
+  </g>
+  
+  <!-- Relationships -->
+  <!-- Customers to Sales -->
+  <path class="relation" d="M230,120 H310 V210" marker-end="url(#arrowhead)" />
+  
+  <!-- Products to Sales -->
+  <path class="relation" d="M570,110 H490 V210" marker-end="url(#arrowhead)" />
+  
+  <!-- Sales to Deliveries -->
+  <path class="relation" d="M490,250 H570" marker-end="url(#arrowhead)" />
+  
+  <!-- Drivers to Deliveries -->
+  <path class="relation" d="M230,290 H570" marker-end="url(#arrowhead)" />
+  
+  <!-- Arrowhead marker -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="400" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle">Petroleum Sales Database Schema</text>
+</svg> 
